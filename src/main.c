@@ -1,5 +1,9 @@
 #include <stm32f031x6.h>
 #include "display.h"
+
+// Pokemon sprites counter
+#define PKCOUNT 2
+
 void initClock(void);
 void initSysTick(void);
 void SysTick_Handler(void);
@@ -8,6 +12,11 @@ void setupIO();
 int isInside(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint16_t px, uint16_t py);
 void enablePullUp(GPIO_TypeDef *Port, uint32_t BitNumber);
 void pinMode(GPIO_TypeDef *Port, uint32_t BitNumber, uint32_t Mode);
+
+// main menu for user to choose pokemon
+const uint16_t *UserChoosePokemon();
+// random choice of cpu pokemon
+const uint16_t *CpuChoosePokemon();
 
 volatile uint32_t milliseconds;
 
@@ -37,7 +46,6 @@ const uint16_t dg1[]=
 {
 	0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,16142,16142,16142,0,0,0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,1994,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,
 };
-//hi
 
 int main()
 {
@@ -50,6 +58,12 @@ int main()
 	uint16_t y = 50;
 	uint16_t oldx = x;
 	uint16_t oldy = y;
+
+	const uint16_t *userSprite = 0;
+	const uint16_t *cpuSprite = 0;
+
+
+	
 	initClock();
 	initSysTick();
 	setupIO();
@@ -59,6 +73,10 @@ int main()
 	putImage(16, 60, 32, 32, pikachu, 1, 0);
 	while(1)
 	{
+		
+		userSprite = UserChoosePokemon();
+		cpuSprite = CpuChoosePokemon();
+
 		hmoved = vmoved = 0;
 		hinverted = vinverted = 0;
 		if ((GPIOB->IDR & (1 << 4))==0) // right pressed
@@ -126,6 +144,21 @@ int main()
 	}
 	return 0;
 }
+
+// let player choose a pokemon to play
+// should return pointer to the sprite player has chosen 
+const uint16_t *UserChoosePokemon()
+{
+	// to do
+}
+
+// randomly choose cpu pokemon 
+// should return pointer to the sprite cpu has chosen
+const uint16_t *CpuChoosePokemon()
+{
+	// to do
+}
+
 void initSysTick(void)
 {
 	SysTick->LOAD = 48000;
