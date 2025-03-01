@@ -3,7 +3,6 @@
 #include "musical_notes.h"
 #include "sound.h"
 
-
 // Pokemon sprites counter
 #define PKCOUNT 2
 // screen width
@@ -29,7 +28,8 @@ int move_down();
 
 
 
-// main menu for user to choose pokemon
+// let player choose a pokemon to play
+// should return pointer to the sprite player has chosen
 uint16_t *UserChoosePokemon();
 // random choice of cpu pokemon
 uint16_t *CpuChoosePokemon();
@@ -107,15 +107,17 @@ int main()
 	
 	while(1)
 	{
+		// keep coding using those values as if
+		// userSprite is a pointer to the sprite chosen by the player
 		userSprite = UserChoosePokemon();
+		// the pointer to sprite chosen by cpu
 		cpuSprite = CpuChoosePokemon();
 		
-		putImage(20, 20, 32, 32, userSprite, 0, 0);
+		// checking if it works. 
+		putImage(20, 20, 32, 32, userSprite, 0, 0);// can be altered or deleted 
 
 		while (1)
 		{
-			
-			
 			hmoved = vmoved = 0;
 			hinverted = vinverted = 0;
 			if ((GPIOB->IDR & (1 << 4)) == 0) // right pressed
@@ -259,7 +261,7 @@ uint16_t *UserChoosePokemon()
 // should return pointer to the sprite cpu has chosen
 uint16_t *CpuChoosePokemon()
 {
-	// to do
+	// to do 																	TO DOOOOOOOOOOOOOOOOOOO
 	return 0;
 }
 
