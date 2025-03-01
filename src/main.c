@@ -296,15 +296,17 @@ void initADC()
 
 void select()
 {
-	pinMode(GPIOB,2,0);
-	int choice = move_down();
+	// pinMode(GPIOB,2,0);
+
+	int choice = move_down();//storing the users choice
 
 	if(button_pressed())
 	{
 		switch (choice)
 		{
 		case 1:
-			/* call scratch func*/
+			// to do
+			/*should call scratch func*/
 			break;
 		
 		default:
@@ -337,14 +339,16 @@ int move_down()
 	switch (move_down)
 	{
 		case 1:
-			/* go to scratch(animation thing) */
-			return move_down;
+			//to do
+			/* should draw an arrow sprite at selexted move*/
+			return move_down;//returns the users current option th the func
 			break;
 		case 2:
-			// go to next option(show animation)
-			return move_down;
+			//to do
+			// should re-draw arrow sprite at next option
+			return move_down;//returns the users current option th the func
 		default:
-			// error messege to termina;
+			// error messege to terminal;
 			break;
 	}
 }
