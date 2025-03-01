@@ -89,10 +89,10 @@ int main()
 	setupIO();
 	// putImage(20,80,12,16,dg1,0,0);
 
-	putImage(80, 16, 32, 32, pikachu, 0, 0);
-	putImage(16, 60, 32, 32, pikachu, 1, 0);
+	// putImage(80, 16, 32, 32, pikachu, 0, 0);
+	// putImage(16, 60, 32, 32, pikachu, 1, 0);
 	
-	playNote(10000);
+	// playNote(10000);
 
 	// while(1)
 	// {
