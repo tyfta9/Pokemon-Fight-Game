@@ -284,6 +284,7 @@ void select()
 
 
 
+
 //function to move down the button options
 int move_down()
 {
@@ -293,13 +294,11 @@ int move_down()
 	if(button_pressed())
 	{
 		move_down++;
+
+		//handles overflow in the case down is pressed 
 		if (move_down > 2)
 		{
 			move_down = 1;
-		}
-		else if (move_down < 1)
-		{
-			move_down = 2;
 		}
 	}
 
@@ -313,9 +312,12 @@ int move_down()
 			// go to next option(show animation)
 			return move_down;
 		default:
+			// error messege to termina;
 			break;
 	}
 }
+
+
 
 //function to check if a button has been pressed
 int button_pressed()
