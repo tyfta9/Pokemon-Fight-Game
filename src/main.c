@@ -1,5 +1,8 @@
 #include <stm32f031x6.h>
 #include "display.h"
+#include "musical_notes.h"
+#include "sound.h"
+
 
 // Pokemon sprites counter
 #define PKCOUNT 2
@@ -19,6 +22,12 @@ void setupIO();
 int isInside(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint16_t px, uint16_t py);
 void enablePullUp(GPIO_TypeDef *Port, uint32_t BitNumber);
 void pinMode(GPIO_TypeDef *Port, uint32_t BitNumber, uint32_t Mode);
+void initADC();
+int button_pressed();
+void select();
+int move_down();
+
+
 
 // main menu for user to choose pokemon
 uint16_t *UserChoosePokemon();
@@ -65,6 +74,10 @@ int main()
 	uint16_t y = 50;
 	uint16_t oldx = x;
 	uint16_t oldy = y;
+	uint8_t pokemon_battle_theme[] = { E4, G4, A4, 0, A4, G4, E4, 0, E4, G4, A4, 0, A4, G4, E4,
+		D4, F4, G4, 0, G4, F4, D4, 0, D4, F4, G4, 0, G4, F4, D4};
+	initADC();
+	initSound();
 
 	uint16_t *userSprite = 0;
 	uint16_t *cpuSprite = 0;
@@ -76,8 +89,22 @@ int main()
 	setupIO();
 	// putImage(20,80,12,16,dg1,0,0);
 
-	// putImage(80, 16, 32, 32, pikachu, 0, 0);
-	// putImage(16, 60, 32, 32, pikachu, 1, 0);
+	putImage(80, 16, 32, 32, pikachu, 0, 0);
+	putImage(16, 60, 32, 32, pikachu, 1, 0);
+	
+	playNote(10000);
+
+	// while(1)
+	// {
+	// 	for (int i = 0; i < 30; i++)
+	// 	{
+	// 		playNote(pokemon_battle_theme[i]);
+
+	// 	}
+		
+
+	// }
+	
 	while(1)
 	{
 		userSprite = UserChoosePokemon();
@@ -325,4 +352,95 @@ void setupIO()
 	enablePullUp(GPIOB,5);
 	enablePullUp(GPIOA,11);
 	enablePullUp(GPIOA,8);
+}
+
+
+void initADC()
+{
+	// Turn on ADC 
+	RCC->APB2ENR |= (1 << 9);		
+    // Enable the reference voltage
+	ADC->CCR |= (1 << 22);	
+	// Begin ADCCalibration	
+	ADC1->CR = ( 1 << 31);
+	// Wait for calibration complete:  
+	while ((ADC1->CR & ( 1 << 31)));
+	// Select Channel 7
+	ADC1->CR |= (1 << 7);	
+	// Enable the ADC
+	ADC1->CR |= (1 << 0);  
+}
+
+void select()
+{
+	// pinMode(GPIOB,2,0);
+
+	int choice = move_down();//storing the users choice
+
+	if(button_pressed())
+	{
+		switch (choice)
+		{
+		case 1:
+			// to do
+			/*should call scratch func*/
+			break;
+		
+		default:
+			break;
+		}
+	}
+
+}
+
+
+
+
+//function to move down the button options
+int move_down()
+{
+	// pinMode(GPIOB,1,0);//setting down button as input
+	static int move_down = 1;//counts every move down
+
+	if(button_pressed())
+	{
+		move_down++;
+
+		//handles overflow in the case down is pressed 
+		if (move_down > 2)
+		{
+			move_down = 1;
+		}
+	}
+
+	switch (move_down)
+	{
+		case 1:
+			//to do
+			/* should draw an arrow sprite at selexted move*/
+			return move_down;//returns the users current option th the func
+			break;
+		case 2:
+			//to do
+			// should re-draw arrow sprite at next option
+			return move_down;//returns the users current option th the func
+		default:
+			// error messege to terminal;
+			break;
+	}
+}
+
+
+
+//function to check if a button has been pressed
+int button_pressed()
+{
+    if((GPIOB->IDR & (1 << 1)) == 0)//checking button input for bit 1
+    {
+        return 1;//if the button is pressed return 1
+    }
+    else
+    {
+        return 0;
+    }
 }
