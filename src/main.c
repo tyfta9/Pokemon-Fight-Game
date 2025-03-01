@@ -246,8 +246,6 @@ void setupIO()
 
 void initADC()
 {
-
-	
 	// Turn on ADC 
 	RCC->APB2ENR |= (1 << 9);		
     // Enable the reference voltage
