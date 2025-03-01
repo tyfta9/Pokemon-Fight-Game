@@ -3,6 +3,10 @@
 #include "musical_notes.h"
 #include "sound.h"
 
+
+// Pokemon sprites counter
+#define PKCOUNT 2
+
 void initClock(void);
 void initSysTick(void);
 void SysTick_Handler(void);
@@ -17,6 +21,11 @@ void select();
 int move_down();
 
 
+
+// main menu for user to choose pokemon
+const uint16_t *UserChoosePokemon();
+// random choice of cpu pokemon
+const uint16_t *CpuChoosePokemon();
 
 volatile uint32_t milliseconds;
 
@@ -62,6 +71,12 @@ int main()
 		D4, F4, G4, 0, G4, F4, D4, 0, D4, F4, G4, 0, G4, F4, D4};
 	initADC();
 	initSound();
+
+	const uint16_t *userSprite = 0;
+	const uint16_t *cpuSprite = 0;
+
+
+	
 	initClock();
 	initSysTick();
 	setupIO();
@@ -85,6 +100,10 @@ int main()
 	
 	while(1)
 	{
+		
+		userSprite = UserChoosePokemon();
+		cpuSprite = CpuChoosePokemon();
+
 		hmoved = vmoved = 0;
 		hinverted = vinverted = 0;
 		if ((GPIOB->IDR & (1 << 4))==0) // right pressed
@@ -152,6 +171,21 @@ int main()
 	}
 	return 0;
 }
+
+// let player choose a pokemon to play
+// should return pointer to the sprite player has chosen 
+const uint16_t *UserChoosePokemon()
+{
+	// to do
+}
+
+// randomly choose cpu pokemon 
+// should return pointer to the sprite cpu has chosen
+const uint16_t *CpuChoosePokemon()
+{
+	// to do
+}
+
 void initSysTick(void)
 {
 	SysTick->LOAD = 48000;
