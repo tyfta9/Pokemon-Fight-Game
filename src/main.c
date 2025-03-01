@@ -3,6 +3,13 @@
 
 // Pokemon sprites counter
 #define PKCOUNT 2
+// screen width
+#define SCREENWIDTH 128
+// screen height
+#define SCREENHEIGHT 160
+// pokemones sprite size in pixels
+// if pokemon sprites are squares
+#define SPRITESIZE 32
 
 void initClock(void);
 void initSysTick(void);
@@ -14,9 +21,9 @@ void enablePullUp(GPIO_TypeDef *Port, uint32_t BitNumber);
 void pinMode(GPIO_TypeDef *Port, uint32_t BitNumber, uint32_t Mode);
 
 // main menu for user to choose pokemon
-const uint16_t *UserChoosePokemon();
+uint16_t *UserChoosePokemon();
 // random choice of cpu pokemon
-const uint16_t *CpuChoosePokemon();
+uint16_t *CpuChoosePokemon();
 
 volatile uint32_t milliseconds;
 
@@ -59,104 +66,174 @@ int main()
 	uint16_t oldx = x;
 	uint16_t oldy = y;
 
-	const uint16_t *userSprite = 0;
-	const uint16_t *cpuSprite = 0;
+	uint16_t *userSprite = 0;
+	uint16_t *cpuSprite = 0;
 
 
 	
 	initClock();
 	initSysTick();
 	setupIO();
-	putImage(20,80,12,16,dg1,0,0);
+	// putImage(20,80,12,16,dg1,0,0);
 
-	putImage(80, 16, 32, 32, pikachu, 0, 0);
-	putImage(16, 60, 32, 32, pikachu, 1, 0);
+	// putImage(80, 16, 32, 32, pikachu, 0, 0);
+	// putImage(16, 60, 32, 32, pikachu, 1, 0);
 	while(1)
 	{
-		
 		userSprite = UserChoosePokemon();
 		cpuSprite = CpuChoosePokemon();
+		
+		putImage(20, 20, 32, 32, userSprite, 0, 0);
 
-		hmoved = vmoved = 0;
-		hinverted = vinverted = 0;
-		if ((GPIOB->IDR & (1 << 4))==0) // right pressed
-		{					
-			if (x < 110)
-			{
-				x = x + 1;
-				hmoved = 1;
-				hinverted=0;
-			}						
-		}
-		if ((GPIOB->IDR & (1 << 5))==0) // left pressed
-		{				
-			if (x > 10)
-			{
-				x = x - 1;
-				hmoved = 1;
-				hinverted=1;
-			}			
-		}
-		if ( (GPIOA->IDR & (1 << 11)) == 0) // down pressed
+		while (1)
 		{
-			if (y < 140)
-			{
-				y = y + 1;			
-				vmoved = 1;
-				vinverted = 0;
+			
+			
+			hmoved = vmoved = 0;
+			hinverted = vinverted = 0;
+			if ((GPIOB->IDR & (1 << 4)) == 0) // right pressed
+			{					
+				if (x < 110)
+				{
+					x = x + 1;
+					hmoved = 1;
+					hinverted = 0;
+				}						
 			}
-		}
-		if ( (GPIOA->IDR & (1 << 8)) == 0) // up pressed
-		{			
-			if (y > 16)
-			{
-				y = y - 1;
-				vmoved = 1;
-				vinverted = 1;
+			if ((GPIOB->IDR & (1 << 5)) == 0) // left pressed
+			{				
+				if (x > 10)
+				{
+					x = x - 1;
+					hmoved = 1;
+					hinverted = 1;
+				}			
 			}
-		}
-		if ((vmoved) || (hmoved))
-		{
-			// only redraw if there has been some movement (reduces flicker)
-			fillRectangle(oldx,oldy,12,16,0);
-			oldx = x;
-			oldy = y;					
-			if (hmoved)
+			if ( (GPIOA->IDR & (1 << 11)) == 0) // down pressed
 			{
-				if (toggle)
-					putImage(x,y,12,16,deco1,hinverted,0);
+				if (y < 140)
+				{
+					y = y + 1;			
+					vmoved = 1;
+					vinverted = 0;
+				}
+			}
+			if ( (GPIOA->IDR & (1 << 8)) == 0) // up pressed
+			{			
+				if (y > 16)
+				{
+					y = y - 1;
+					vmoved = 1;
+					vinverted = 1;
+				}
+			}
+			if ((vmoved) || (hmoved))
+			{
+				// only redraw if there has been some movement (reduces flicker)
+				fillRectangle(oldx,oldy,12,16,0);
+				oldx = x;
+				oldy = y;					
+				if (hmoved)
+				{
+					if (toggle)
+						putImage(x,y,12,16,deco1,hinverted,0);
+					else
+						putImage(x,y,12,16,deco2,hinverted,0);
+
+					toggle = toggle ^ 1;
+				}
 				else
-					putImage(x,y,12,16,deco2,hinverted,0);
-				
-				toggle = toggle ^ 1;
-			}
-			else
-			{
-				putImage(x,y,12,16,deco3,0,vinverted);
-			}
-			// Now check for an overlap by checking to see if ANY of the 4 corners of deco are within the target area
-			if (isInside(20,80,12,16,x,y) || isInside(20,80,12,16,x+12,y) || isInside(20,80,12,16,x,y+16) || isInside(20,80,12,16,x+12,y+16) )
-			{
-				printTextX2("GLUG!", 10, 20, RGBToWord(0xff,0xff,0), 0);
-			}
-		}		
-		delay(50);
+				{
+					putImage(x,y,12,16,deco3,0,vinverted);
+				}
+				// Now check for an overlap by checking to see if ANY of the 4 corners of deco are within the target area
+				if (isInside(20,80,12,16,x,y) || isInside(20,80,12,16,x+12,y) || isInside(20,80,12,16,x,y+16) || isInside(20,80,12,16,x+12,y+16) )
+				{
+					printTextX2("GLUG!", 10, 20, RGBToWord(0xff,0xff,0), 0);
+				}
+			}	
+
+			delay(50);
+		}
 	}
 	return 0;
 }
 
 // let player choose a pokemon to play
 // should return pointer to the sprite player has chosen 
-const uint16_t *UserChoosePokemon()
+uint16_t *UserChoosePokemon()
 {
-	// to do
+	// buffer or line x position
+	uint8_t lineX1 = 5; 
+	// top line y position
+	uint8_t lineY1 = SCREENHEIGHT - 40;
+	// length of line
+	uint8_t width = SCREENWIDTH - lineX1*2;
+	// height of the lines
+	uint8_t height = 2;
+	// color of lines and text
+	uint16_t color = -255;
+	// prompt for user
+	char *prompt = "Choose pokemon!";
+
+	// draw pokemones to choose 
+	putImage((lineX1), (lineY1/2-SPRITESIZE/2), SPRITESIZE, SPRITESIZE, pikachu, 0, 0);
+	putImage((SCREENWIDTH-SPRITESIZE-lineX1), (lineY1/2-SPRITESIZE/2), SPRITESIZE, SPRITESIZE, charmander, 0, 0);
+
+	// draw pointer at pokemones to prompt user																			TO DOOOOOOOOOOOOOOOO
+	//drawCircle();
+	
+	// draw top line for text
+	fillRectangle(lineX1, lineY1, width, height, color);
+	// draw bottom line for text
+	fillRectangle(lineX1, SCREENHEIGHT - lineX1, width, height, color);
+	// write a prompt for user to chose a pokemon
+	printText(prompt, lineX1*2, (SCREENHEIGHT - lineY1 - lineX1 - height)/2 + lineY1, color, 0);
+
+	while(1)
+	{
+		// if left button is pressed
+		if((GPIOB->IDR & (1 << 5)) == 0)
+		{
+			// wait until the button is undone
+			while((GPIOB->IDR & (1 << 5)) == 0)
+			{
+				delay(20);
+			}
+
+			// erase screen
+			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
+
+			// return pointer that points at chosen sprite
+			return &pikachu;
+		}
+
+		// if right button is pressed
+		if((GPIOB->IDR & (1 << 4)) == 0)
+		{
+			// wait until the button is undone
+			while((GPIOB->IDR & (1 << 4)) == 0)
+			{
+				delay(20);
+			}
+
+			// erase screen
+			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
+
+			// return pointer that points at chosen sprite
+			return &charmander;
+		}
+	}
+
+	return 0;
 }
 
 // randomly choose cpu pokemon 
 // should return pointer to the sprite cpu has chosen
-const uint16_t *CpuChoosePokemon()
+uint16_t *CpuChoosePokemon()
 {
 	// to do
+	return 0;
 }
 
 void initSysTick(void)
