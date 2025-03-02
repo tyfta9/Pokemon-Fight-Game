@@ -1,4 +1,5 @@
 #include <stm32f031x6.h>
+#include <stdlib.h>
 #include "display.h"
 #include "musical_notes.h"
 #include "sound.h"
@@ -30,9 +31,9 @@ int move_down();
 
 // let player choose a pokemon to play
 // should return pointer to the sprite player has chosen
-uint16_t *UserChoosePokemon();
+const uint16_t *UserChoosePokemon();
 // random choice of cpu pokemon, except specified sprite
-uint16_t *CpuChoosePokemon(uint16_t *userSprite);
+const uint16_t *CpuChoosePokemon(const uint16_t *userSprite);
 
 volatile uint32_t milliseconds;
 
@@ -79,8 +80,8 @@ int main()
 	initADC();
 	initSound();
 
-	uint16_t *userSprite = 0;
-	uint16_t *cpuSprite = 0;
+	const uint16_t *userSprite = 0;
+	const uint16_t *cpuSprite = 0;
 
 
 	
@@ -191,7 +192,7 @@ int main()
 
 // let player choose a pokemon to play
 // should return pointer to the sprite player has chosen 
-uint16_t *UserChoosePokemon()
+const uint16_t *UserChoosePokemon()
 {
 	// buffer or top, bottom line, x position
 	uint8_t lineX1 = 5; 
@@ -256,7 +257,7 @@ uint16_t *UserChoosePokemon()
 			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
 
 			// return pointer that points at chosen sprite
-			return &pikachu;
+			return pikachu;
 		}
 
 		// if right button is pressed
@@ -278,7 +279,7 @@ uint16_t *UserChoosePokemon()
 			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
 
 			// return pointer that points at chosen sprite
-			return &charmander;
+			return charmander;
 		}
 	}
 
@@ -287,7 +288,7 @@ uint16_t *UserChoosePokemon()
 
 // randomly choose cpu pokemon 
 // should return pointer to the sprite cpu has chosen
-uint16_t *CpuChoosePokemon(uint16_t *userSprite)
+const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 {
 	uint8_t choise = 0;
 
@@ -303,25 +304,25 @@ uint16_t *CpuChoosePokemon(uint16_t *userSprite)
 		// return it
 		case 0:
 			if(userSprite != pikachu)
-				return &pikachu;
+				return pikachu;
 			break;
 		// if case is 1 and user have not chosen the same pokemon
 		// return it
 		case 1:
 			if(userSprite != charmander)
-				return &charmander;
+				return charmander;
 			break;
 		// if case is 2 and user have not chosen the same pokemon
 		// return it
 		case 2:
 			if(userSprite != pikachu) //                                            Matter for change if we add more pokemones
-				return &pikachu; //                                            Matter for change if we add more pokemones
+				return pikachu; //                                            Matter for change if we add more pokemones
 			break;
 		// if case is 3 and user have not chosen the same pokemon
 		// return it
 		case 3:
 			if(userSprite != charmander) //                                            Matter for change if we add more pokemones
-				return &charmander; //                                            Matter for change if we add more pokemones
+				return charmander; //                                            Matter for change if we add more pokemones
 			break;
 		default:
 			// do nothing
@@ -497,7 +498,7 @@ int move_down()
 			// error messege to terminal;
 			break;
 	}
-}
+} // This warning says that you have to return somthing in case it does not in switch block..........................................................................................................
 
 
 
