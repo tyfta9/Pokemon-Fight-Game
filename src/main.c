@@ -192,43 +192,64 @@ int main()
 // should return pointer to the sprite player has chosen 
 uint16_t *UserChoosePokemon()
 {
-	// buffer or line x position
+	// buffer or top, bottom line, x position
 	uint8_t lineX1 = 5; 
-	// top line y position
-	uint8_t lineY1 = SCREENHEIGHT - 40;
+	// top line, y position
+	uint8_t lineY1 = SCREENHEIGHT - 30;
+	// radius of button prompts
+	uint8_t radius = 8;
+	// circle color
+	uint16_t circleColor = RGBToWord(255,50,0);
+	// button buffer, space between circle and filled circle
+	uint8_t buttonBuffer = 4;
+	// button buffer, space between circle and filled circle when the button is pressed
+	uint8_t pressedButtonBuffer = buttonBuffer - 2;
+	// delay after button is pressed
+	uint8_t buttonDelay = 200;
 	// length of line
 	uint8_t width = SCREENWIDTH - lineX1*2;
 	// height of the lines
 	uint8_t height = 2;
-	// color of lines and text
-	uint16_t color = -255;
+	// color of lines and text, -255
+	uint16_t color = RGBToWord(255,50,0);
 	// prompt for user
 	char *prompt = "Choose pokemon!";
 
 	// draw pokemones to choose 
-	putImage((lineX1), (lineY1/2-SPRITESIZE/2), SPRITESIZE, SPRITESIZE, pikachu, 0, 0);
+	putImage(lineX1, (lineY1/2-SPRITESIZE/2), SPRITESIZE, SPRITESIZE, pikachu, 0, 0);
 	putImage((SCREENWIDTH-SPRITESIZE-lineX1), (lineY1/2-SPRITESIZE/2), SPRITESIZE, SPRITESIZE, charmander, 0, 0);
 
-	// draw pointer at pokemones to prompt user																			TO DOOOOOOOOOOOOOOOO
-	//drawCircle();
+	// draw pointer at left pokemon to prompt user
+	drawCircle((lineX1+SPRITESIZE+radius), lineY1/2, radius, circleColor);
+	fillCircle((lineX1+SPRITESIZE+radius), lineY1/2, radius-buttonBuffer, circleColor);
+	// draw pointer at right pokemon to prompt user
+	drawCircle((SCREENWIDTH-(lineX1+SPRITESIZE+radius)), lineY1/2, radius, circleColor);
+	fillCircle((SCREENWIDTH-(lineX1+SPRITESIZE+radius)), lineY1/2, radius-buttonBuffer, circleColor);
+	
 	
 	// draw top line for text
 	fillRectangle(lineX1, lineY1, width, height, color);
 	// draw bottom line for text
-	fillRectangle(lineX1, SCREENHEIGHT - lineX1, width, height, color);
+	fillRectangle(lineX1, (SCREENHEIGHT-height), width, height, color);
 	// write a prompt for user to chose a pokemon
-	printText(prompt, lineX1*2, (SCREENHEIGHT - lineY1 - lineX1 - height)/2 + lineY1, color, 0);
+	printText(prompt, lineX1*2, ((SCREENHEIGHT-lineY1-lineX1-height)/2 + lineY1), color, 0);
 
 	while(1)
 	{
 		// if left button is pressed
 		if((GPIOB->IDR & (1 << 5)) == 0)
 		{
+			// if the button is pressed, fill the circle more to show that it is selected
+			fillCircle((lineX1+SPRITESIZE+radius), lineY1/2, radius-pressedButtonBuffer, circleColor);
+
 			// wait until the button is undone
 			while((GPIOB->IDR & (1 << 5)) == 0)
 			{
 				delay(20);
 			}
+
+			// wait to show the player's selection
+			delay(buttonDelay);
 
 			// erase screen
 			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
@@ -240,11 +261,17 @@ uint16_t *UserChoosePokemon()
 		// if right button is pressed
 		if((GPIOB->IDR & (1 << 4)) == 0)
 		{
+			// if the button is pressed, fill the circle more to show that it is selected
+			fillCircle((SCREENWIDTH-(lineX1+SPRITESIZE+radius)), lineY1/2, radius-pressedButtonBuffer, circleColor);
+
 			// wait until the button is undone
 			while((GPIOB->IDR & (1 << 4)) == 0)
 			{
 				delay(20);
 			}
+
+			// wait to show the player's selection
+			delay(buttonDelay);
 
 			// erase screen
 			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
