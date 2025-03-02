@@ -31,8 +31,8 @@ int move_down();
 // let player choose a pokemon to play
 // should return pointer to the sprite player has chosen
 uint16_t *UserChoosePokemon();
-// random choice of cpu pokemon
-uint16_t *CpuChoosePokemon();
+// random choice of cpu pokemon, except specified sprite
+uint16_t *CpuChoosePokemon(uint16_t *userSprite);
 
 volatile uint32_t milliseconds;
 
@@ -111,10 +111,11 @@ int main()
 		// userSprite is a pointer to the sprite chosen by the player
 		userSprite = UserChoosePokemon();
 		// the pointer to sprite chosen by cpu
-		cpuSprite = CpuChoosePokemon();
+		cpuSprite = CpuChoosePokemon(userSprite);
 		
 		// checking if it works. 
-		putImage(20, 20, 32, 32, userSprite, 0, 0);// can be altered or deleted 
+		putImage(20, 80, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);// can be altered or deleted 
+		putImage(80, 20, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);// can be altered or deleted
 
 		while (1)
 		{
@@ -286,9 +287,48 @@ uint16_t *UserChoosePokemon()
 
 // randomly choose cpu pokemon 
 // should return pointer to the sprite cpu has chosen
-uint16_t *CpuChoosePokemon()
+uint16_t *CpuChoosePokemon(uint16_t *userSprite)
 {
-	// to do 																	TO DOOOOOOOOOOOOOOOOOOO
+	uint8_t choise = 0;
+
+	// keep going until cpu chooses pokemon
+	while(1)
+	{
+		// choose 1 or 0
+		choise = rand() % 2; //                                            Matter for change if we add more pokemones
+
+		switch (choise)
+		{
+		// if case is 0 and user have not chosen the same pokemon
+		// return it
+		case 0:
+			if(userSprite != pikachu)
+				return &pikachu;
+			break;
+		// if case is 1 and user have not chosen the same pokemon
+		// return it
+		case 1:
+			if(userSprite != charmander)
+				return &charmander;
+			break;
+		// if case is 2 and user have not chosen the same pokemon
+		// return it
+		case 2:
+			if(userSprite != pikachu) //                                            Matter for change if we add more pokemones
+				return &pikachu; //                                            Matter for change if we add more pokemones
+			break;
+		// if case is 3 and user have not chosen the same pokemon
+		// return it
+		case 3:
+			if(userSprite != charmander) //                                            Matter for change if we add more pokemones
+				return &charmander; //                                            Matter for change if we add more pokemones
+			break;
+		default:
+			// do nothing
+			break;
+		}
+	}
+
 	return 0;
 }
 
