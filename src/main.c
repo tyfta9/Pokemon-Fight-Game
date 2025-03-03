@@ -34,6 +34,8 @@ int move_down();
 const uint16_t *UserChoosePokemon();
 // random choice of cpu pokemon, except specified sprite
 const uint16_t *CpuChoosePokemon(const uint16_t *userSprite);
+// draw the menu frame, top line and bottom line
+void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t thickness, uint16_t color);
 
 volatile uint32_t milliseconds;
 
@@ -117,6 +119,9 @@ int main()
 		// checking if it works. 
 		putImage(20, 80, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);// can be altered or deleted 
 		putImage(80, 20, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);// can be altered or deleted
+
+		// checking if menu works
+		DrawMenuFrame(5, 80+32, 2, RGBToWord(255,50,0));// sample use of draw menu function
 
 		while (1)
 		{
@@ -208,8 +213,6 @@ const uint16_t *UserChoosePokemon()
 	uint8_t pressedButtonBuffer = buttonBuffer - 2;
 	// delay after button is pressed
 	uint8_t buttonDelay = 200;
-	// length of line
-	uint8_t width = SCREENWIDTH - lineX1*2;
 	// height of the lines
 	uint8_t height = 2;
 	// color of lines and text, -255
@@ -228,11 +231,13 @@ const uint16_t *UserChoosePokemon()
 	drawCircle((SCREENWIDTH-(lineX1+SPRITESIZE+radius)), lineY1/2, radius, circleColor);
 	fillCircle((SCREENWIDTH-(lineX1+SPRITESIZE+radius)), lineY1/2, radius-buttonBuffer, circleColor);
 	
-	
-	// draw top line for text
-	fillRectangle(lineX1, lineY1, width, height, color);
-	// draw bottom line for text
-	fillRectangle(lineX1, (SCREENHEIGHT-height), width, height, color);
+	// draw text, menu frame
+	DrawMenuFrame(lineX1, lineY1, height, color);
+	// // draw top line for text
+	// fillRectangle(lineX1, lineY1, width, height, color);
+	// // draw bottom line for text
+	// fillRectangle(lineX1, (SCREENHEIGHT-height), width, height, color);
+
 	// write a prompt for user to chose a pokemon
 	printText(prompt, lineX1*2, ((SCREENHEIGHT-lineY1-lineX1-height)/2 + lineY1), color, 0);
 
@@ -331,6 +336,15 @@ const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 	}
 
 	return 0;
+}
+
+// draw the menu frame, x and y position is top left corner of the menu
+void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t thickness, uint16_t color)
+{
+	// draw top line for menu
+	fillRectangle(xPosition, yPosition, (SCREENWIDTH-xPosition*2), thickness, color);
+	// draw bottom line for menu
+	fillRectangle(xPosition, (SCREENHEIGHT-thickness), (SCREENWIDTH-xPosition*2), thickness, color);
 }
 
 void initSysTick(void)
