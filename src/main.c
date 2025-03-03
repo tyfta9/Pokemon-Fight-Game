@@ -1,11 +1,18 @@
 #include <stm32f031x6.h>
+#include <stdlib.h>
 #include "display.h"
 #include "musical_notes.h"
 #include "sound.h"
 
-
 // Pokemon sprites counter
 #define PKCOUNT 2
+// screen width
+#define SCREENWIDTH 128
+// screen height
+#define SCREENHEIGHT 160
+// pokemones sprite size in pixels
+// if pokemon sprites are squares
+#define SPRITESIZE 32
 
 void initClock(void);
 void initSysTick(void);
@@ -22,10 +29,13 @@ int move_down();
 
 
 
-// main menu for user to choose pokemon
+// let player choose a pokemon to play
+// should return pointer to the sprite player has chosen
 const uint16_t *UserChoosePokemon();
-// random choice of cpu pokemon
-const uint16_t *CpuChoosePokemon();
+// random choice of cpu pokemon, except specified sprite
+const uint16_t *CpuChoosePokemon(const uint16_t *userSprite);
+// draw the menu frame, top line and bottom line
+void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t thickness, uint16_t color);
 
 volatile uint32_t milliseconds;
 
@@ -107,74 +117,87 @@ int main()
 	
 	while(1)
 	{
-		
+		// keep coding using those values as if
+		// userSprite is a pointer to the sprite chosen by the player
 		userSprite = UserChoosePokemon();
-		cpuSprite = CpuChoosePokemon();
+		// the pointer to sprite chosen by cpu
+		cpuSprite = CpuChoosePokemon(userSprite);
+		
+		// checking if it works. 
+		putImage(20, 80, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);// can be altered or deleted 
+		putImage(80, 20, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);// can be altered or deleted
 
-		hmoved = vmoved = 0;
-		hinverted = vinverted = 0;
-		if ((GPIOB->IDR & (1 << 4))==0) // right pressed
-		{					
-			if (x < 110)
-			{
-				x = x + 1;
-				hmoved = 1;
-				hinverted=0;
-			}						
-		}
-		if ((GPIOB->IDR & (1 << 5))==0) // left pressed
-		{				
-			if (x > 10)
-			{
-				x = x - 1;
-				hmoved = 1;
-				hinverted=1;
-			}			
-		}
-		if ( (GPIOA->IDR & (1 << 11)) == 0) // down pressed
+		// checking if menu works
+		DrawMenuFrame(5, 80+32, 2, RGBToWord(255,50,0));// sample use of draw menu function
+
+		while (1)
 		{
-			if (y < 140)
-			{
-				y = y + 1;			
-				vmoved = 1;
-				vinverted = 0;
+			hmoved = vmoved = 0;
+			hinverted = vinverted = 0;
+			if ((GPIOB->IDR & (1 << 4)) == 0) // right pressed
+			{					
+				if (x < 110)
+				{
+					x = x + 1;
+					hmoved = 1;
+					hinverted = 0;
+				}						
 			}
-		}
-		if ( (GPIOA->IDR & (1 << 8)) == 0) // up pressed
-		{			
-			if (y > 16)
-			{
-				y = y - 1;
-				vmoved = 1;
-				vinverted = 1;
+			if ((GPIOB->IDR & (1 << 5)) == 0) // left pressed
+			{				
+				if (x > 10)
+				{
+					x = x - 1;
+					hmoved = 1;
+					hinverted = 1;
+				}			
 			}
-		}
-		if ((vmoved) || (hmoved))
-		{
-			// only redraw if there has been some movement (reduces flicker)
-			fillRectangle(oldx,oldy,12,16,0);
-			oldx = x;
-			oldy = y;					
-			if (hmoved)
+			if ( (GPIOA->IDR & (1 << 11)) == 0) // down pressed
 			{
-				if (toggle)
-					putImage(x,y,12,16,deco1,hinverted,0);
+				if (y < 140)
+				{
+					y = y + 1;			
+					vmoved = 1;
+					vinverted = 0;
+				}
+			}
+			if ( (GPIOA->IDR & (1 << 8)) == 0) // up pressed
+			{			
+				if (y > 16)
+				{
+					y = y - 1;
+					vmoved = 1;
+					vinverted = 1;
+				}
+			}
+			if ((vmoved) || (hmoved))
+			{
+				// only redraw if there has been some movement (reduces flicker)
+				fillRectangle(oldx,oldy,12,16,0);
+				oldx = x;
+				oldy = y;					
+				if (hmoved)
+				{
+					if (toggle)
+						putImage(x,y,12,16,deco1,hinverted,0);
+					else
+						putImage(x,y,12,16,deco2,hinverted,0);
+
+					toggle = toggle ^ 1;
+				}
 				else
-					putImage(x,y,12,16,deco2,hinverted,0);
-				
-				toggle = toggle ^ 1;
-			}
-			else
-			{
-				putImage(x,y,12,16,deco3,0,vinverted);
-			}
-			// Now check for an overlap by checking to see if ANY of the 4 corners of deco are within the target area
-			if (isInside(20,80,12,16,x,y) || isInside(20,80,12,16,x+12,y) || isInside(20,80,12,16,x,y+16) || isInside(20,80,12,16,x+12,y+16) )
-			{
-				printTextX2("GLUG!", 10, 20, RGBToWord(0xff,0xff,0), 0);
-			}
-		}		
-		delay(50);
+				{
+					putImage(x,y,12,16,deco3,0,vinverted);
+				}
+				// Now check for an overlap by checking to see if ANY of the 4 corners of deco are within the target area
+				if (isInside(20,80,12,16,x,y) || isInside(20,80,12,16,x+12,y) || isInside(20,80,12,16,x,y+16) || isInside(20,80,12,16,x+12,y+16) )
+				{
+					printTextX2("GLUG!", 10, 20, RGBToWord(0xff,0xff,0), 0);
+				}
+			}	
+
+			delay(50);
+		}
 	}
 	return 0;
 }
@@ -183,14 +206,152 @@ int main()
 // should return pointer to the sprite player has chosen 
 const uint16_t *UserChoosePokemon()
 {
-	// to do
+	// buffer or top, bottom line, x position
+	uint8_t lineX1 = 5; 
+	// top line, y position
+	uint8_t lineY1 = SCREENHEIGHT - 30;
+	// radius of button prompts
+	uint8_t radius = 8;
+	// circle color
+	uint16_t circleColor = RGBToWord(255,50,0);
+	// button buffer, space between circle and filled circle
+	uint8_t buttonBuffer = 4;
+	// button buffer, space between circle and filled circle when the button is pressed
+	uint8_t pressedButtonBuffer = buttonBuffer - 2;
+	// delay after button is pressed
+	uint8_t buttonDelay = 200;
+	// height of the lines
+	uint8_t height = 2;
+	// color of lines and text, -255
+	uint16_t color = RGBToWord(255,50,0);
+	// prompt for user
+	char *prompt = "Choose pokemon!";
+
+	// draw pokemones to choose 
+	putImage(lineX1, (lineY1/2-SPRITESIZE/2), SPRITESIZE, SPRITESIZE, pikachu, 0, 0);
+	putImage((SCREENWIDTH-SPRITESIZE-lineX1), (lineY1/2-SPRITESIZE/2), SPRITESIZE, SPRITESIZE, charmander, 0, 0);
+
+	// draw pointer at left pokemon to prompt user
+	drawCircle((lineX1+SPRITESIZE+radius), lineY1/2, radius, circleColor);
+	fillCircle((lineX1+SPRITESIZE+radius), lineY1/2, radius-buttonBuffer, circleColor);
+	// draw pointer at right pokemon to prompt user
+	drawCircle((SCREENWIDTH-(lineX1+SPRITESIZE+radius)), lineY1/2, radius, circleColor);
+	fillCircle((SCREENWIDTH-(lineX1+SPRITESIZE+radius)), lineY1/2, radius-buttonBuffer, circleColor);
+	
+	// draw text, menu frame
+	DrawMenuFrame(lineX1, lineY1, height, color);
+	// // draw top line for text
+	// fillRectangle(lineX1, lineY1, width, height, color);
+	// // draw bottom line for text
+	// fillRectangle(lineX1, (SCREENHEIGHT-height), width, height, color);
+
+	// write a prompt for user to chose a pokemon
+	printText(prompt, lineX1*2, ((SCREENHEIGHT-lineY1-lineX1-height)/2 + lineY1), color, 0);
+
+	while(1)
+	{
+		// if left button is pressed
+		if((GPIOB->IDR & (1 << 5)) == 0)
+		{
+			// if the button is pressed, fill the circle more to show that it is selected
+			fillCircle((lineX1+SPRITESIZE+radius), lineY1/2, radius-pressedButtonBuffer, circleColor);
+
+			// wait until the button is undone
+			while((GPIOB->IDR & (1 << 5)) == 0)
+			{
+				delay(20);
+			}
+
+			// wait to show the player's selection
+			delay(buttonDelay);
+
+			// erase screen
+			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
+
+			// return pointer that points at chosen sprite
+			return pikachu;
+		}
+
+		// if right button is pressed
+		if((GPIOB->IDR & (1 << 4)) == 0)
+		{
+			// if the button is pressed, fill the circle more to show that it is selected
+			fillCircle((SCREENWIDTH-(lineX1+SPRITESIZE+radius)), lineY1/2, radius-pressedButtonBuffer, circleColor);
+
+			// wait until the button is undone
+			while((GPIOB->IDR & (1 << 4)) == 0)
+			{
+				delay(20);
+			}
+
+			// wait to show the player's selection
+			delay(buttonDelay);
+
+			// erase screen
+			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
+
+			// return pointer that points at chosen sprite
+			return charmander;
+		}
+	}
+
+	return 0;
 }
 
 // randomly choose cpu pokemon 
 // should return pointer to the sprite cpu has chosen
-const uint16_t *CpuChoosePokemon()
+const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 {
-	// to do
+	uint8_t choise = 0;
+
+	// keep going until cpu chooses pokemon
+	while(1)
+	{
+		// choose 1 or 0
+		choise = rand() % 2; //                                            Matter for change if we add more pokemones
+
+		switch (choise)
+		{
+		// if case is 0 and user have not chosen the same pokemon
+		// return it
+		case 0:
+			if(userSprite != pikachu)
+				return pikachu;
+			break;
+		// if case is 1 and user have not chosen the same pokemon
+		// return it
+		case 1:
+			if(userSprite != charmander)
+				return charmander;
+			break;
+		// if case is 2 and user have not chosen the same pokemon
+		// return it
+		case 2:
+			if(userSprite != pikachu) //                                            Matter for change if we add more pokemones
+				return pikachu; //                                            Matter for change if we add more pokemones
+			break;
+		// if case is 3 and user have not chosen the same pokemon
+		// return it
+		case 3:
+			if(userSprite != charmander) //                                            Matter for change if we add more pokemones
+				return charmander; //                                            Matter for change if we add more pokemones
+			break;
+		default:
+			// do nothing
+			break;
+		}
+	}
+
+	return 0;
+}
+
+// draw the menu frame, x and y position is top left corner of the menu
+void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t thickness, uint16_t color)
+{
+	// draw top line for menu
+	fillRectangle(xPosition, yPosition, (SCREENWIDTH-xPosition*2), thickness, color);
+	// draw bottom line for menu
+	fillRectangle(xPosition, (SCREENHEIGHT-thickness), (SCREENWIDTH-xPosition*2), thickness, color);
 }
 
 void initSysTick(void)
@@ -360,7 +521,7 @@ int move_down()
 			// error messege to terminal;
 			break;
 	}
-}
+} // This warning says that you have to return somthing in case it does not in switch block..........................................................................................................
 
 
 
