@@ -11,8 +11,6 @@
 // pokemon sprite size in pixels
 // if pokemon sprites are squares
 #define SPRITESIZE 32
-// Pokemon sprites counter                              MATTER TO CHANGE IF WE ADD MORE POKEMON
-#define SPRITECOUNT 2                 
 
 //macros for arrow and move position
 
@@ -24,6 +22,8 @@
 #define START 118 // Arrow starting position
 
 
+// Pokemon sprites counter                              MATTER TO CHANGE IF WE ADD MORE POKEMON
+#define SPRITECOUNT 2                 
 
 void initClock(void);
 void initSysTick(void);
@@ -177,7 +177,7 @@ int main()
 				select_charmder();
 
 			}
-			//if left button pressed repeat
+			
 
 		}
 			
