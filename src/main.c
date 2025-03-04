@@ -11,6 +11,17 @@
 // pokemon sprite size in pixels
 // if pokemon sprites are squares
 #define SPRITESIZE 32
+
+//macros for arrow and move position
+
+
+#define INC 14//detrmines the spacing between moves
+
+#define X 65//constant x position of arrow
+
+#define START 118 // Arrow starting position
+
+
 // Pokemon sprites counter                              MATTER TO CHANGE IF WE ADD MORE POKEMON
 #define SPRITECOUNT 2                 
 
@@ -24,8 +35,16 @@ void enablePullUp(GPIO_TypeDef *Port, uint32_t BitNumber);
 void pinMode(GPIO_TypeDef *Port, uint32_t BitNumber, uint32_t Mode);
 void initADC();
 int button_pressed();
-void select();
-int move_down();
+void select_pika();
+int move_up_func(void);
+int move_down_func(void);
+void scratch();
+void pika_moves();
+void select_charmder();
+void charm_moves();
+
+
+
 
 
 
@@ -49,6 +68,10 @@ const uint16_t charmander[]=
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,58136,58136,58136,58136,58136,58136,0,0,0,0,0,0,0,0,0,0,0,0,0,0,58136,0,0,0,0,0,0,0,0,0,0,0,58136,58136,58136,58136,58136,58136,0,0,0,0,0,0,0,0,0,0,0,0,0,0,58136,0,0,0,0,0,0,0,0,0,58136,58136,7940,7940,7940,7940,7940,7940,58136,0,0,0,0,0,0,0,0,0,0,0,58136,58136,64041,58136,0,0,0,0,0,0,0,58136,7940,7940,7940,7940,7940,7940,7940,7940,7940,58136,58136,0,0,0,0,0,0,0,0,0,58136,58136,64041,64041,58136,58136,0,0,0,0,0,58136,7940,7940,7940,7940,7940,7940,7940,7940,7940,58136,58136,0,0,0,0,0,0,0,0,0,58136,58136,64041,64041,58136,58136,0,0,0,0,0,58136,7940,7940,7940,7940,7940,7940,7940,7940,7940,58136,58136,0,0,0,0,0,0,0,0,0,58136,58136,64041,64041,58136,58136,0,0,0,0,58136,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,58136,58136,0,0,0,0,0,58136,58136,64041,64041,64041,64041,64041,64041,58136,0,0,0,58136,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,58136,58136,0,0,0,0,0,58136,58136,64041,64041,64041,64041,64041,64041,58136,0,58136,58136,7940,7940,7940,7940,7940,65535,65535,0,7940,7940,7940,7940,7940,58136,58136,0,0,0,0,0,58136,58136,64041,64041,64041,32575,64041,64041,58136,0,58136,58136,7940,7940,7940,7940,7940,0,0,0,7940,7940,7940,7940,7940,7940,7940,58136,0,0,0,0,58136,58136,64041,64041,32575,32575,64041,64041,58136,0,58136,58136,7940,7940,7940,7940,7940,0,0,0,7940,7940,7940,7940,7940,7940,7940,58136,0,0,0,0,0,0,58136,58136,32575,58136,58136,58136,0,0,58136,58136,7940,7940,7940,7940,7940,0,0,0,7940,7940,7940,7940,7940,7940,7940,58136,0,0,0,0,0,0,58136,58136,32575,58136,58136,58136,0,0,0,0,58136,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,58136,0,0,0,0,0,58136,58136,7940,58136,0,0,0,0,0,0,0,58136,58136,58136,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,58136,58136,0,58136,58136,7940,7940,7940,58136,0,0,0,0,0,0,0,58136,58136,58136,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,7940,58136,58136,0,58136,58136,7940,7940,7940,58136,0,0,0,0,0,0,0,0,0,0,58136,58136,58136,58136,7940,7940,7940,58136,58136,7940,7940,7940,7940,58136,58136,58136,7940,7940,7940,7940,58136,0,0,0,0,0,0,0,0,0,0,0,0,58136,58136,32575,32575,32575,58136,7940,7940,7940,7940,7940,7940,7940,7940,58136,7940,7940,7940,7940,58136,0,0,0,0,0,0,0,0,0,0,0,0,58136,58136,32575,32575,32575,58136,7940,7940,7940,7940,7940,7940,7940,7940,58136,7940,7940,7940,7940,58136,0,0,0,0,0,0,0,0,0,0,0,0,58136,58136,32575,32575,32575,32575,58136,58136,58136,58136,7940,7940,7940,7940,58136,7940,7940,58136,58136,0,0,0,0,0,0,0,0,0,0,0,0,58136,65535,65535,58136,32575,32575,32575,32575,32575,7940,7940,7940,7940,7940,7940,58136,58136,58136,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,58136,58136,58136,58136,58136,32575,32575,32575,7940,7940,7940,7940,58136,58136,58136,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,58136,58136,58136,58136,58136,32575,32575,32575,7940,7940,7940,7940,58136,58136,58136,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,58136,58136,58136,58136,58136,7940,58136,58136,58136,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,58136,58136,58136,58136,58136,7940,58136,58136,58136,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,58136,58136,65535,65535,7940,65535,58136,58136,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,58136,58136,58136,58136,58136,58136,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 };
 
+const uint16_t select_arrow[] = {
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,30918,30918,0,0,0,0,0,0,0,0,30918,30918,30918,0,0,0,0,0,0,0,30918,30918,30918,30918,0,0,0,0,0,0,30918,30918,30918,0,0,0,0,0,0,0,30918,30918,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+};
+
 const uint16_t deco1[]=
 {
 0,0,0,0,4,4,4,4,4,0,0,0,0,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,65415,65415,65415,248,65415,0,0,0,0,0,0,0,65415,65415,65415,65415,65415,8068,0,0,0,0,0,0,65415,65415,65415,4096,4096,0,0,0,0,0,0,0,0,65415,65415,65415,0,0,0,0,0,0,0,0,0,7936,7936,7936,0,0,0,0,0,0,0,0,7936,7936,65535,7936,0,0,0,0,0,0,0,0,7936,7936,65535,7936,7936,7936,7936,0,0,0,0,0,7936,7936,65535,65535,65535,65535,7936,0,0,0,0,0,7936,7936,7936,7936,7936,7936,7936,0,0,0,0,0,7936,7936,7936,7936,0,0,0,0,0,0,0,0,0,7936,65535,7936,0,0,0,0,0,0,0,0,0,7936,65535,7936,0,0,0,0,0,0,0,0,0,7936,65535,7936,0,0,0,0,0,0,0,0,0,7940,7940,7940,7940,0,0,0,
@@ -66,8 +89,15 @@ const uint16_t dg1[]=
 	0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,16142,16142,16142,0,0,0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,1994,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,
 };
 
+
+
+
+
+
 int main()
 {
+	
+
 	int hinverted = 0;
 	int vinverted = 0;
 	int toggle = 0;
@@ -84,18 +114,19 @@ int main()
 
 	const uint16_t *userSprite = 0;
 	const uint16_t *cpuSprite = 0;
+	uint16_t color = RGBToWord(255,50,0);
+
+	
 
 
 	
 	initClock();
 	initSysTick();
 	setupIO();
-	// putImage(20,80,12,16,dg1,0,0);
-
-	// putImage(80, 16, 32, 32, pikachu, 0, 0);
-	// putImage(16, 60, 32, 32, pikachu, 1, 0);
 	
-	// playNote(10000);
+	
+	
+	playNote(10000);
 
 	// while(1)
 	// {
@@ -120,77 +151,107 @@ int main()
 		putImage(20, 80, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);// can be altered or deleted 
 		putImage(80, 20, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);// can be altered or deleted
 
-		// checking if menu works
-		DrawMenuFrame(5, 80+32, 2, RGBToWord(255,50,0));// sample use of draw menu function
+		
+		
 
-		while (1)
+			
+		
+		//loops menu options
+		while(1)
 		{
-			hmoved = vmoved = 0;
-			hinverted = vinverted = 0;
-			if ((GPIOB->IDR & (1 << 4)) == 0) // right pressed
-			{					
-				if (x < 110)
-				{
-					x = x + 1;
-					hmoved = 1;
-					hinverted = 0;
-				}						
-			}
-			if ((GPIOB->IDR & (1 << 5)) == 0) // left pressed
-			{				
-				if (x > 10)
-				{
-					x = x - 1;
-					hmoved = 1;
-					hinverted = 1;
-				}			
-			}
-			if ( (GPIOA->IDR & (1 << 11)) == 0) // down pressed
-			{
-				if (y < 140)
-				{
-					y = y + 1;			
-					vmoved = 1;
-					vinverted = 0;
-				}
-			}
-			if ( (GPIOA->IDR & (1 << 8)) == 0) // up pressed
-			{			
-				if (y > 16)
-				{
-					y = y - 1;
-					vmoved = 1;
-					vinverted = 1;
-				}
-			}
-			if ((vmoved) || (hmoved))
-			{
-				// only redraw if there has been some movement (reduces flicker)
-				fillRectangle(oldx,oldy,12,16,0);
-				oldx = x;
-				oldy = y;					
-				if (hmoved)
-				{
-					if (toggle)
-						putImage(x,y,12,16,deco1,hinverted,0);
-					else
-						putImage(x,y,12,16,deco2,hinverted,0);
+			DrawMenuFrame(5, 80+32, 2, RGBToWord(255,50,0));//draw menu function
 
-					toggle = toggle ^ 1;
-				}
-				else
-				{
-					putImage(x,y,12,16,deco3,0,vinverted);
-				}
-				// Now check for an overlap by checking to see if ANY of the 4 corners of deco are within the target area
-				if (isInside(20,80,12,16,x,y) || isInside(20,80,12,16,x+12,y) || isInside(20,80,12,16,x,y+16) || isInside(20,80,12,16,x+12,y+16) )
-				{
-					printTextX2("GLUG!", 10, 20, RGBToWord(0xff,0xff,0), 0);
-				}
-			}	
+			
 
-			delay(50);
+			move_down_func();
+
+			//checks what pokemon user choose to determine move set
+			if(userSprite == pikachu)
+			{
+				pika_moves();//draws pika's moves
+				select_pika();
+			}
+			else
+			{
+				charm_moves();
+				select_charmder();
+
+			}
+			
+
 		}
+			
+		
+		
+
+		// while (1)
+		// {
+		// 	hmoved = vmoved = 0;
+		// 	hinverted = vinverted = 0;
+		// 	if ((GPIOB->IDR & (1 << 4)) == 0) // right pressed
+		// 	{					
+		// 		if (x < 110)
+		// 		{
+		// 			x = x + 1;
+		// 			hmoved = 1;
+		// 			hinverted = 0;
+		// 		}						
+		// 	}
+		// 	if ((GPIOB->IDR & (1 << 5)) == 0) // left pressed
+		// 	{				
+		// 		if (x > 10)
+		// 		{
+		// 			x = x - 1;
+		// 			hmoved = 1;
+		// 			hinverted = 1;
+		// 		}			
+		// 	}
+		// 	if ( (GPIOA->IDR & (1 << 11)) == 0) // down pressed
+		// 	{
+		// 		if (y < 140)
+		// 		{
+		// 			y = y + 1;			
+		// 			vmoved = 1;
+		// 			vinverted = 0;
+		// 		}
+		// 	}
+		// 	if ( (GPIOA->IDR & (1 << 8)) == 0) // up pressed
+		// 	{			
+		// 		if (y > 16)
+		// 		{
+		// 			y = y - 1;
+		// 			vmoved = 1;
+		// 			vinverted = 1;
+		// 		}
+		// 	}
+		// 	if ((vmoved) || (hmoved))
+		// 	{
+		// 		// only redraw if there has been some movement (reduces flicker)
+		// 		fillRectangle(oldx,oldy,12,16,0);
+		// 		oldx = x;
+		// 		oldy = y;					
+		// 		if (hmoved)
+		// 		{
+		// 			if (toggle)
+		// 				putImage(x,y,12,16,deco1,hinverted,0);
+		// 			else
+		// 				putImage(x,y,12,16,deco2,hinverted,0);
+
+		// 			toggle = toggle ^ 1;
+		// 		}
+		// 		else
+		// 		{
+		// 			putImage(x,y,12,16,deco3,0,vinverted);
+		// 		}
+		// 		// Now check for an overlap by checking to see if ANY of the 4 corners of deco are within the target area
+		// 		if (isInside(20,80,12,16,x,y) || isInside(20,80,12,16,x+12,y) || isInside(20,80,12,16,x,y+16) || isInside(20,80,12,16,x+12,y+16) )
+		// 		{
+		// 			printTextX2("GLUG!", 10, 20, RGBToWord(0xff,0xff,0), 0);
+		// 		}
+		// 	}	
+
+		// 	delay(50);
+		// }
 	}
 	return 0;
 }
@@ -256,9 +317,13 @@ const uint16_t *UserChoosePokemon()
 
 			// erase screen
 			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
+			
+			
+
 
 			// return pointer that points at chosen sprite
 			return pikachu;
+			
 		}
 
 		// if right button is pressed
@@ -278,6 +343,7 @@ const uint16_t *UserChoosePokemon()
 
 			// erase screen
 			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
+			
 
 			// return pointer that points at chosen sprite
 			return charmander;
@@ -451,25 +517,67 @@ void initADC()
 	ADC1->CR |= (1 << 0);  
 }
 
-void select()
+void select_pika()//selects pokemon move
 {
-	// pinMode(GPIOB,2,0);
+	
+	
+	
+	uint16_t color = RGBToWord(255,50,0);
+	int choice = move_down_func();//storing the users choice
 
-	int choice = move_down();//storing the users choice
-
-	if(button_pressed())
+	if(((GPIOB->IDR & (1 << 4)) == 0) )
 	{
+		delay(500);//stops extra input
+		char *promt1 = "Pika used Scratch!";
+		char *prompt2  = "Pika used Thunder!";
+		char *prompt3 = "Pika used Heal!";
+		int width = 125;
+		int height =40;
+
+		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow drawn by move down func
+
 		switch (choice)
 		{
 		case 1:
-			// to do
-			/*should call scratch func*/
+
+			fillRectangle(X, 115, width, height, 0x0);//erases moves
+			printText(promt1, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
 			break;
+
+		case 2:
+			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+			printText(prompt2, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+		
+			case 3:
+			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+			printText(prompt3, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+			
 		
 		default:
 			break;
 		}
 	}
+		
 
 }
 
@@ -477,50 +585,132 @@ void select()
 
 
 //function to move down the button options
-int move_down()
+int move_down_func(void)
 {
-	// pinMode(GPIOB,1,0);//setting down button as input
-	static int move_down = 1;//counts every move down
+	
 
-	if(button_pressed())
+	static int move_down = 1;  
+	
+
+	// puts arrow at start move
+	if ((GPIOA->IDR & (1 << 11)) == 0) 
 	{
-		move_down++;
+		delay(500);  //stops multiple button presses
 
-		//handles overflow in the case down is pressed 
-		if (move_down > 2)
+		// clears prev arrow sprite
+		fillRectangle(X, START + (move_down - 1) * INC, 10, 10, 0x0);
+
+		move_down++;  // Move to the next move
+		
+		// handles overflow
+		if (move_down > 3)
 		{
 			move_down = 1;
 		}
 	}
 
-	switch (move_down)
-	{
-		case 1:
-			//to do
-			/* should draw an arrow sprite at selexted move*/
-			return move_down;//returns the users current option th the func
-			break;
-		case 2:
-			//to do
-			// should re-draw arrow sprite at next option
-			return move_down;//returns the users current option th the func
-		default:
-			// error messege to terminal;
-			break;
-	}
-} // This warning says that you have to return somthing in case it does not in switch block..........................................................................................................
+	// draw the new arrow at the selected position
+	putImage(X, START + (move_down - 1) * INC, 10, 10, select_arrow, 0, 0);
 
 
+	delay(120);  //delay for asthetics
+	return move_down;//returnimg current arrow position
 
-//function to check if a button has been pressed
-int button_pressed()
-{
-    if((GPIOB->IDR & (1 << 1)) == 0)//checking button input for bit 1
-    {
-        return 1;//if the button is pressed return 1
-    }
-    else
-    {
-        return 0;
-    }
 }
+
+
+void pika_moves()//pikachu move set
+{
+	uint16_t color = RGBToWord(255,50,0);
+	char *scratch_mv_txt = "Scratch";
+	char *Heal_mv_txt = "Heal";
+	char *Spark_mv_txt = "Thunder";
+
+
+	printText(scratch_mv_txt, 75, 118, color, 0);
+	printText(Spark_mv_txt, 75, 132, color, 0);
+	printText(Heal_mv_txt, 75, 146, color, 0);
+
+}
+
+
+void charm_moves()//charmander move set
+{
+	uint16_t color = RGBToWord(255,50,0);
+	char *scratch_mv_txt = "Scratch";
+	char *Heal_mv_txt = "Heal";
+	char *Spark_mv_txt = "Ember";
+
+
+	printText(scratch_mv_txt, 75, 118, color, 0);
+	printText(Spark_mv_txt, 75, 132, color, 0);
+	printText(Heal_mv_txt, 75, 146, color, 0);
+
+}
+
+void select_charmder()//removable if any of you find a better solution
+{
+	uint16_t color = RGBToWord(255,50,0);
+	int choice = move_down_func();//storing the users choice
+
+	if(((GPIOB->IDR & (1 << 4)) == 0) )
+	{
+		delay(500);//stops extra input
+		char *promt1 = "Char used Scratch!";
+		char *prompt2  = "Char used Ember!";
+		char *prompt3 = "Char used Heal!";
+		int width = 125;
+		int height =40;
+
+		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow draw by move down func
+
+		switch (choice)
+		{
+		case 1:
+
+			fillRectangle(X, 115, width, height, 0x0);//erases moves
+			printText(promt1, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+
+		case 2:
+			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+			printText(prompt2, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+
+
+			case 3:
+			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+			printText(prompt3, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+			
+		
+		default:
+			break;
+		}
+	}
+		
+
+}
+	
+
+
+
+
