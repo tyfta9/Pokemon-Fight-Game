@@ -4,15 +4,15 @@
 #include "musical_notes.h"
 #include "sound.h"
 
-// Pokemon sprites counter
-#define PKCOUNT 2
 // screen width
 #define SCREENWIDTH 128
 // screen height
 #define SCREENHEIGHT 160
-// pokemones sprite size in pixels
+// pokemon sprite size in pixels
 // if pokemon sprites are squares
 #define SPRITESIZE 32
+// Pokemon sprites counter                              MATTER TO CHANGE IF WE ADD MORE POKEMON
+#define SPRITECOUNT 2                 
 
 //macros for arrow and move position
 
@@ -54,7 +54,7 @@ const uint16_t *UserChoosePokemon();
 // random choice of cpu pokemon, except specified sprite
 const uint16_t *CpuChoosePokemon(const uint16_t *userSprite);
 // draw the menu frame, top line and bottom line
-void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t thickness, uint16_t color);
+void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t menuThickness, uint16_t menuColor);
 
 volatile uint32_t milliseconds;
 
@@ -260,47 +260,43 @@ int main()
 // should return pointer to the sprite player has chosen 
 const uint16_t *UserChoosePokemon()
 {
-	// buffer or top, bottom line, x position
-	uint8_t lineX1 = 5; 
-	// top line, y position
-	uint8_t lineY1 = SCREENHEIGHT - 30;
+	// menu x position and spacing
+	uint8_t xPosition = 5; 
+	// menu y position
+	uint8_t yPosition = SCREENHEIGHT - 30;
 	// radius of button prompts
-	uint8_t radius = 8;
-	// circle color
-	uint16_t circleColor = RGBToWord(255,50,0);
-	// button buffer, space between circle and filled circle
-	uint8_t buttonBuffer = 4;
-	// button buffer, space between circle and filled circle when the button is pressed
-	uint8_t pressedButtonBuffer = buttonBuffer - 2;
+	uint8_t buttonRadius = 8;
+	// button color
+	uint16_t buttonColor = RGBToWord(255,50,0);
+	// button space between circle and filled circle
+	uint8_t buttonSpacing = 4;
+	// button space between circle and filled circle when the button is pressed
+	uint8_t pressedButtonSpacing = buttonSpacing - 2;
 	// delay after button is pressed
 	uint8_t buttonDelay = 200;
-	// height of the lines
-	uint8_t height = 2;
-	// color of lines and text, -255
-	uint16_t color = RGBToWord(255,50,0);
+	// thickness of the menu
+	uint8_t menuThickness = 2;
+	// color of menu and text
+	uint16_t menuColor = RGBToWord(255,50,0);
 	// prompt for user
 	char *prompt = "Choose pokemon!";
 
-	// draw pokemones to choose 
-	putImage(lineX1, (lineY1/2-SPRITESIZE/2), SPRITESIZE, SPRITESIZE, pikachu, 0, 0);
-	putImage((SCREENWIDTH-SPRITESIZE-lineX1), (lineY1/2-SPRITESIZE/2), SPRITESIZE, SPRITESIZE, charmander, 0, 0);
+	// draw pokemon to choose 
+	putImage(xPosition, (yPosition/2-SPRITESIZE/2), SPRITESIZE, SPRITESIZE, pikachu, 0, 0);
+	putImage((SCREENWIDTH-SPRITESIZE-xPosition), (yPosition/2-SPRITESIZE/2), SPRITESIZE, SPRITESIZE, charmander, 0, 0);
 
 	// draw pointer at left pokemon to prompt user
-	drawCircle((lineX1+SPRITESIZE+radius), lineY1/2, radius, circleColor);
-	fillCircle((lineX1+SPRITESIZE+radius), lineY1/2, radius-buttonBuffer, circleColor);
+	drawCircle((xPosition+SPRITESIZE+buttonRadius), yPosition/2, buttonRadius, buttonColor);
+	fillCircle((xPosition+SPRITESIZE+buttonRadius), yPosition/2, buttonRadius-buttonSpacing, buttonColor);
 	// draw pointer at right pokemon to prompt user
-	drawCircle((SCREENWIDTH-(lineX1+SPRITESIZE+radius)), lineY1/2, radius, circleColor);
-	fillCircle((SCREENWIDTH-(lineX1+SPRITESIZE+radius)), lineY1/2, radius-buttonBuffer, circleColor);
+	drawCircle((SCREENWIDTH-(xPosition+SPRITESIZE+buttonRadius)), yPosition/2, buttonRadius, buttonColor);
+	fillCircle((SCREENWIDTH-(xPosition+SPRITESIZE+buttonRadius)), yPosition/2, buttonRadius-buttonSpacing, buttonColor);
 	
-	// draw text, menu frame
-	DrawMenuFrame(lineX1, lineY1, height, color);
-	// // draw top line for text
-	// fillRectangle(lineX1, lineY1, width, height, color);
-	// // draw bottom line for text
-	// fillRectangle(lineX1, (SCREENHEIGHT-height), width, height, color);
+	// draw menu frame
+	DrawMenuFrame(xPosition, yPosition, menuThickness, menuColor);
 
 	// write a prompt for user to chose a pokemon
-	printText(prompt, lineX1*2, ((SCREENHEIGHT-lineY1-lineX1-height)/2 + lineY1), color, 0);
+	printText(prompt, xPosition*2, ((SCREENHEIGHT-yPosition-xPosition-menuThickness)/2 + yPosition), menuColor, 0);
 
 	while(1)
 	{
@@ -308,7 +304,7 @@ const uint16_t *UserChoosePokemon()
 		if((GPIOB->IDR & (1 << 5)) == 0)
 		{
 			// if the button is pressed, fill the circle more to show that it is selected
-			fillCircle((lineX1+SPRITESIZE+radius), lineY1/2, radius-pressedButtonBuffer, circleColor);
+			fillCircle((xPosition+SPRITESIZE+buttonRadius), yPosition/2, buttonRadius-pressedButtonSpacing, buttonColor);
 
 			// wait until the button is undone
 			while((GPIOB->IDR & (1 << 5)) == 0)
@@ -334,7 +330,7 @@ const uint16_t *UserChoosePokemon()
 		if((GPIOB->IDR & (1 << 4)) == 0)
 		{
 			// if the button is pressed, fill the circle more to show that it is selected
-			fillCircle((SCREENWIDTH-(lineX1+SPRITESIZE+radius)), lineY1/2, radius-pressedButtonBuffer, circleColor);
+			fillCircle((SCREENWIDTH-(xPosition+SPRITESIZE+buttonRadius)), yPosition/2, buttonRadius-pressedButtonSpacing, buttonColor);
 
 			// wait until the button is undone
 			while((GPIOB->IDR & (1 << 4)) == 0)
@@ -357,19 +353,19 @@ const uint16_t *UserChoosePokemon()
 	return 0;
 }
 
-// randomly choose cpu pokemon 
+// randomly choose cpu pokemon
 // should return pointer to the sprite cpu has chosen
 const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 {
-	uint8_t choise = 0;
+	uint8_t choice = 0;
 
 	// keep going until cpu chooses pokemon
 	while(1)
 	{
 		// choose 1 or 0
-		choise = rand() % 2; //                                            Matter for change if we add more pokemones
+		choice = rand() % SPRITECOUNT;
 
-		switch (choise)
+		switch (choice)
 		{
 		// if case is 0 and user have not chosen the same pokemon
 		// return it
@@ -386,14 +382,14 @@ const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 		// if case is 2 and user have not chosen the same pokemon
 		// return it
 		case 2:
-			if(userSprite != pikachu) //                                            Matter for change if we add more pokemones
-				return pikachu; //                                            Matter for change if we add more pokemones
+			if(userSprite != pikachu) //                                            Matter for change if we add more pokemon
+				return pikachu; //                                            Matter for change if we add more pokemon
 			break;
 		// if case is 3 and user have not chosen the same pokemon
 		// return it
 		case 3:
-			if(userSprite != charmander) //                                            Matter for change if we add more pokemones
-				return charmander; //                                            Matter for change if we add more pokemones
+			if(userSprite != charmander) //                                            Matter for change if we add more pokemon
+				return charmander; //                                            Matter for change if we add more pokemon
 			break;
 		default:
 			// do nothing
@@ -405,16 +401,12 @@ const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 }
 
 // draw the menu frame, x and y position is top left corner of the menu
-void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t thickness, uint16_t color)
-{	
-	
+void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t menuThickness, uint16_t menuColor)
+{
 	// draw top line for menu
-	fillRectangle(xPosition, yPosition, (SCREENWIDTH-xPosition*2), thickness, color);
+	fillRectangle(xPosition, yPosition, (SCREENWIDTH-xPosition*2), menuThickness, menuColor);
 	// draw bottom line for menu
-	fillRectangle(xPosition, (SCREENHEIGHT-thickness), (SCREENWIDTH-xPosition*2), thickness, color);
-	
-
-	
+	fillRectangle(xPosition, (SCREENHEIGHT-menuThickness), (SCREENWIDTH-xPosition*2), menuThickness, menuColor);
 }
 
 void initSysTick(void)
