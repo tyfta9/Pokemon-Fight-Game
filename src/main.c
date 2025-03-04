@@ -177,7 +177,7 @@ int main()
 				select_charmder();
 
 			}
-			//if left button pressed repeat
+			
 
 		}
 			
