@@ -42,6 +42,7 @@ void scratch();
 void pika_moves();
 void select_charmder();
 void charm_moves();
+void playTune(uint32_t [], uint32_t [], int);
 
 
 
@@ -107,10 +108,12 @@ int main()
 	uint16_t y = 50;
 	uint16_t oldx = x;
 	uint16_t oldy = y;
-	uint8_t pokemon_battle_theme[] = { E4, G4, A4, 0, A4, G4, E4, 0, E4, G4, A4, 0, A4, G4, E4,
-		D4, F4, G4, 0, G4, F4, D4, 0, D4, F4, G4, 0, G4, F4, D4};
+	uint32_t pokemon_battle_theme[] = { AS4_Bb4, F4, DS4_Eb4, F4, AS4_Bb4, F4, DS4_Eb4, F4, 
+		AS4_Bb4, DS5_Eb5, CS5_Db5, AS4_Bb4, GS4_Ab4, F4, DS4_Eb4, C4};
+	uint32_t theme_durations[] = { 150, 150, 150, 150, 150, 150, 150, 150,
+		300, 300, 300, 300, 300, 300, 300, 300};
 	initADC();
-	initSound();
+	
 
 	const uint16_t *userSprite = 0;
 	const uint16_t *cpuSprite = 0;
@@ -124,10 +127,11 @@ int main()
 	initSysTick();
 	setupIO();
 	
+	initSound();
 	
-	
-	playNote(10000);
+	// playNote(1000);
 
+	playTune(pokemon_battle_theme, theme_durations, 16);
 	// while(1)
 	// {
 	// 	for (int i = 0; i < 30; i++)
@@ -711,6 +715,17 @@ void select_charmder()//removable if any of you find a better solution
 }
 	
 
-
+void playTune(uint32_t notes[], uint32_t durations[], int count)
+{
+	int index=0;
+	while(index < count)
+	{
+		playNote(notes[index]);
+		delay(durations[index]);
+		playNote(0);
+		delay(100);
+		index++;
+	}
+}
 
 
