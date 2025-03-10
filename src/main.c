@@ -52,7 +52,8 @@ void pika_moves();
 void select_charmder();
 void charm_moves();
 void playTune(uint32_t [], uint32_t [], int);
-int cpu_choose_move();
+void cpu_choose_move();
+void pika_health();
 
 
 
@@ -106,7 +107,7 @@ const uint16_t dg1[]=
 };
 
 
-
+int pikachu_health = 100;
 
 
 
@@ -176,6 +177,7 @@ int main()
 			//checks what pokemon user choose to determine move set
 			if(userSprite == pikachu)
 			{
+				//pika health
 				pika_moves();//draws pika's moves
 				select_pika();
 				cpu_choose_move();
@@ -684,6 +686,7 @@ int move_down_func(void)
 void pika_moves()//pikachu move set
 {
 	uint16_t color = RGBToWord(255,50,0);
+	fillRectangle(50,20,20,10,color);
 	char *scratch_mv_txt = "Scratch";
 	char *Heal_mv_txt = "Heal";
 	char *Spark_mv_txt = "Thunder";
@@ -787,7 +790,7 @@ void playTune(uint32_t notes[], uint32_t durations[], int count)
 }
 
 
-int cpu_choose_move()
+void cpu_choose_move()
 {
 	int move_choice = 0;
 	uint16_t color = RGBToWord(255,50,0);
@@ -846,13 +849,24 @@ int cpu_choose_move()
 			
 		
 		default:
+			return -1;
 			break;
 		}
 	}
-		
+}
+
+
+
+
+void pika_health()
+{
+	
+
 
 
 }
+
+
 
 
 
