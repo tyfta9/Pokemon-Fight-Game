@@ -23,6 +23,9 @@
 // character width
 #define CHAR_WIDTH 6.5
 
+
+#define CPU_MOVE_CHOICE 3
+
 //macros for arrow and move position
 #define INC 14//detrmines the spacing between moves
 #define X 65//constant x position of arrow
@@ -46,6 +49,8 @@ void pika_moves();
 void select_charmder();
 void charm_moves();
 void playTune(uint32_t [], uint32_t [], int);
+void cpu_choose_move();
+void pika_health();
 
 
 
@@ -97,6 +102,11 @@ const uint16_t dg1[]=
 {
 	0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,16142,16142,16142,0,0,0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,1994,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,
 };
+
+
+int pikachu_health = 100;
+
+
 
 int main()
 {
@@ -159,6 +169,13 @@ int main()
 		// checking if it works. 
 		putImage(playerX, playerY, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);// can be altered or deleted 
 		putImage(cpuX, cpuY, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);// can be altered or deleted
+		putImage(20, 80, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);// can be altered or deleted 
+		putImage(80, 20, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);// can be altered or deleted
+		DrawMenuFrame(5, 80+32, 2, RGBToWord(255,50,0));//draw menu function
+		
+		
+
+			
 		
 		//loops menu options
 		while(1)
@@ -170,18 +187,25 @@ int main()
 			//checks what pokemon user choose to determine move set
 			if(userSprite == pikachu)
 			{
+				//pika health
 				pika_moves();//draws pika's moves
 				select_pika();
+				cpu_choose_move();
+				
 			}
 			else
 			{
-				charm_moves();
+				charm_moves();                   
 				select_charmder();
 			}
+			
+
+
+
 		}
 
 		// while (1)
-		// {
+		// sh
 		// 	hmoved = vmoved = 0;
 		// 	hinverted = vinverted = 0;
 		// 	if ((GPIOB->IDR & (1 << 4)) == 0) // right pressed
@@ -589,12 +613,10 @@ void initADC()
 void select_pika()//selects pokemon move
 {
 	
-	
-	
 	uint16_t color = RGBToWord(255,50,0);
 	int choice = move_down_func();//storing the users choice
 
-	if(((GPIOB->IDR & (1 << 4)) == 0) )
+	if(((GPIOB->IDR & (1 << 4)) == 0) )//right button presssed
 	{
 		delay(500);//stops extra input
 		char *prompt1 = "Pika used Scratch!";
@@ -694,6 +716,7 @@ int move_down_func(void)
 void pika_moves()//pikachu move set
 {
 	uint16_t color = RGBToWord(255,50,0);
+	fillRectangle(50,20,20,10,color);
 	char *scratch_mv_txt = "Scratch";
 	char *Heal_mv_txt = "Heal";
 	char *Spark_mv_txt = "Thunder";
@@ -798,5 +821,85 @@ void playTune(uint32_t notes[], uint32_t durations[], int count)
 		index++;
 	}
 }
+
+
+void cpu_choose_move()
+{
+	int move_choice = 0;
+	uint16_t color = RGBToWord(255,50,0);
+
+
+	move_choice = (rand() % CPU_MOVE_CHOICE) + 1;
+
+
+	if(((GPIOB->IDR & (1 << 4)) == 0) )
+	{
+		delay(500);//stops extra input
+		char *promt1 = "Char used Scratch!";
+		char *prompt2  = "Char used Ember!";
+		char *prompt3 = "Char used Heal!";
+		int width = 125;
+		int height =40;
+
+		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow draw by move down func
+
+		switch (move_choice)
+		{
+		case 1:
+
+			fillRectangle(X, 115, width, height, 0x0);//erases moves
+			printText(promt1, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+
+		case 2:
+			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+			printText(prompt2, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+
+
+			case 3:
+			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+			printText(prompt3, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+			
+		
+		default:
+			return -1;
+			break;
+		}
+	}
+}
+
+
+
+
+void pika_health()
+{
+	
+
+
+
+}
+
+
+
 
 
