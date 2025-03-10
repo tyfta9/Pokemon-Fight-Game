@@ -139,6 +139,12 @@ int main()
 
 	while(1)
 	{
+		int playerX = 20;
+		int playerY = 70;
+		int cpuX = SCREENWIDTH-SPRITESIZE-playerX; // mirrored 
+		int cpuY = playerX;
+
+
 		// displays the start screen for the user
 		DisplayStartScreen();
 
@@ -149,13 +155,13 @@ int main()
 		cpuSprite = CpuChoosePokemon(userSprite);
 		
 		// checking if it works. 
-		putImage(20, 80, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);// can be altered or deleted 
-		putImage(80, 20, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);// can be altered or deleted
+		putImage(playerX, playerY, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);// can be altered or deleted 
+		putImage(cpuX, cpuY, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);// can be altered or deleted
 		
 		//loops menu options
 		while(1)
 		{
-			DrawMenuFrame(5, 80+32, 2, RGBToWord(255,50,0));//draw menu function
+			DrawMenuFrame(5, playerY+SPRITESIZE+5, 2, RGBToWord(255,50,0));//draw menu function
 
 			move_down_func();
 
@@ -169,7 +175,6 @@ int main()
 			{
 				charm_moves();
 				select_charmder();
-
 			}
 		}
 
