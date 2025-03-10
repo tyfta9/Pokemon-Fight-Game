@@ -150,7 +150,7 @@ int main()
 		// checking if it works. 
 		putImage(20, 80, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);// can be altered or deleted 
 		putImage(80, 20, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);// can be altered or deleted
-
+		DrawMenuFrame(5, 80+32, 2, RGBToWord(255,50,0));//draw menu function
 		
 		
 
@@ -159,8 +159,6 @@ int main()
 		//loops menu options
 		while(1)
 		{
-			DrawMenuFrame(5, 80+32, 2, RGBToWord(255,50,0));//draw menu function
-
 			
 
 			move_down_func();
@@ -173,7 +171,7 @@ int main()
 			}
 			else
 			{
-				charm_moves();
+				charm_moves();                   
 				select_charmder();
 
 			}
@@ -185,7 +183,7 @@ int main()
 		
 
 		// while (1)
-		// {
+		// sh
 		// 	hmoved = vmoved = 0;
 		// 	hinverted = vinverted = 0;
 		// 	if ((GPIOB->IDR & (1 << 4)) == 0) // right pressed
@@ -525,7 +523,7 @@ void select_pika()//selects pokemon move
 	uint16_t color = RGBToWord(255,50,0);
 	int choice = move_down_func();//storing the users choice
 
-	if(((GPIOB->IDR & (1 << 4)) == 0) )
+	if(((GPIOB->IDR & (1 << 5)) == 0) )//right but
 	{
 		delay(500);//stops extra input
 		char *promt1 = "Pika used Scratch!";
