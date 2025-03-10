@@ -392,7 +392,7 @@ const uint16_t *UserChoosePokemon()
 			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
 			
 			// send serial massage, report players choice
-			eputs(strcat(serialMessage, "Pikachu!\n"));
+			MessageLog(strcat(serialMessage, "Pikachu!"));
 
 			// return pointer that points at chosen sprite
 			return pikachu;
@@ -417,7 +417,7 @@ const uint16_t *UserChoosePokemon()
 			fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0x0);
 			
 			// send serial massage, report players choice
-			eputs(strcat(serialMessage, "Charmander!\n"));
+			MessageLog(strcat(serialMessage, "Charmander!"));
 
 			// return pointer that points at chosen sprite
 			return charmander;
@@ -493,6 +493,13 @@ void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t menuThickness, 
 	fillRectangle(xPosition, yPosition, (SCREENWIDTH-xPosition*2), menuThickness, menuColor);
 	// draw bottom line for menu
 	fillRectangle(xPosition, (SCREENHEIGHT-menuThickness), (SCREENWIDTH-xPosition*2), menuThickness, menuColor);
+}
+
+// put message to serial log
+void MessageLog(char *message)
+{
+	eputs(message);
+	eputchar('\n');
 }
 
 void initSysTick(void)
@@ -612,7 +619,7 @@ void select_pika()//selects pokemon move
 	if(((GPIOB->IDR & (1 << 4)) == 0) )//right button presssed
 	{
 		delay(500);//stops extra input
-		char *promt1 = "Pika used Scratch!";
+		char *prompt1 = "Pika used Scratch!";
 		char *prompt2  = "Pika used Thunder!";
 		char *prompt3 = "Pika used Heal!";
 		int width = 125;
@@ -625,7 +632,8 @@ void select_pika()//selects pokemon move
 		case 1:
 
 			fillRectangle(X, 115, width, height, 0x0);//erases moves
-			printText(promt1, 4, 126, color, 0);
+			printText(prompt1, 4, 126, color, 0);
+			MessageLog(prompt1); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
@@ -637,6 +645,7 @@ void select_pika()//selects pokemon move
 		case 2:
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
 			printText(prompt2, 4, 126, color, 0);
+			MessageLog(prompt2); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
@@ -648,6 +657,7 @@ void select_pika()//selects pokemon move
 			case 3:
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
 			printText(prompt3, 4, 126, color, 0);
+			MessageLog(prompt3); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
@@ -741,7 +751,7 @@ void select_charmder()//removable if any of you find a better solution
 	if(((GPIOB->IDR & (1 << 4)) == 0) )
 	{
 		delay(500);//stops extra input
-		char *promt1 = "Char used Scratch!";
+		char *prompt1 = "Char used Scratch!";
 		char *prompt2  = "Char used Ember!";
 		char *prompt3 = "Char used Heal!";
 		int width = 125;
@@ -754,7 +764,8 @@ void select_charmder()//removable if any of you find a better solution
 		case 1:
 
 			fillRectangle(X, 115, width, height, 0x0);//erases moves
-			printText(promt1, 4, 126, color, 0);
+			printText(prompt1, 4, 126, color, 0);
+			MessageLog(prompt1); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
@@ -766,6 +777,7 @@ void select_charmder()//removable if any of you find a better solution
 		case 2:
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
 			printText(prompt2, 4, 126, color, 0);
+			MessageLog(prompt2); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
@@ -778,6 +790,7 @@ void select_charmder()//removable if any of you find a better solution
 			case 3:
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
 			printText(prompt3, 4, 126, color, 0);
+			MessageLog(prompt3); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
