@@ -139,10 +139,12 @@ int main()
 
 	while(1)
 	{
-		int playerX = 20;
+		int playerX = 15;
 		int playerY = 70;
 		int cpuX = SCREENWIDTH-SPRITESIZE-playerX; // mirrored 
 		int cpuY = playerX;
+		int spacing = 5; // space between users sprite and menu
+		int menuThickness = 2;
 
 
 		// displays the start screen for the user
@@ -161,7 +163,7 @@ int main()
 		//loops menu options
 		while(1)
 		{
-			DrawMenuFrame(5, playerY+SPRITESIZE+5, 2, RGBToWord(255,50,0));//draw menu function
+			DrawMenuFrame(spacing, playerY+SPRITESIZE+spacing, menuThickness, RGBToWord(255,50,0));//draw menu function
 
 			move_down_func();
 
