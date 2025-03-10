@@ -20,9 +20,10 @@
 // character width
 #define CHAR_WIDTH 6.5
 
+
+#define CPU_MOVE_CHOICE 3
+
 //macros for arrow and move position
-
-
 #define INC 14//detrmines the spacing between moves
 
 #define X 65//constant x position of arrow
@@ -51,6 +52,7 @@ void pika_moves();
 void select_charmder();
 void charm_moves();
 void playTune(uint32_t [], uint32_t [], int);
+int cpu_choose_move();
 
 
 
@@ -169,8 +171,6 @@ int main()
 		//loops menu options
 		while(1)
 		{
-			
-
 			move_down_func();
 
 			//checks what pokemon user choose to determine move set
@@ -178,14 +178,17 @@ int main()
 			{
 				pika_moves();//draws pika's moves
 				select_pika();
+				cpu_choose_move();
+				
 			}
 			else
 			{
 				charm_moves();                   
 				select_charmder();
-
 			}
 			
+
+
 
 		}
 			
@@ -581,12 +584,10 @@ void initADC()
 void select_pika()//selects pokemon move
 {
 	
-	
-	
 	uint16_t color = RGBToWord(255,50,0);
 	int choice = move_down_func();//storing the users choice
 
-	if(((GPIOB->IDR & (1 << 5)) == 0) )//right but
+	if(((GPIOB->IDR & (1 << 4)) == 0) )//right button presssed
 	{
 		delay(500);//stops extra input
 		char *promt1 = "Pika used Scratch!";
@@ -784,5 +785,74 @@ void playTune(uint32_t notes[], uint32_t durations[], int count)
 		index++;
 	}
 }
+
+
+int cpu_choose_move()
+{
+	int move_choice = 0;
+	uint16_t color = RGBToWord(255,50,0);
+
+
+	move_choice = (rand() % CPU_MOVE_CHOICE) + 1;
+
+
+	if(((GPIOB->IDR & (1 << 4)) == 0) )
+	{
+		delay(500);//stops extra input
+		char *promt1 = "Char used Scratch!";
+		char *prompt2  = "Char used Ember!";
+		char *prompt3 = "Char used Heal!";
+		int width = 125;
+		int height =40;
+
+		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow draw by move down func
+
+		switch (move_choice)
+		{
+		case 1:
+
+			fillRectangle(X, 115, width, height, 0x0);//erases moves
+			printText(promt1, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+
+		case 2:
+			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+			printText(prompt2, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+
+
+			case 3:
+			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+			printText(prompt3, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+			
+		
+		default:
+			break;
+		}
+	}
+		
+
+
+}
+
 
 
