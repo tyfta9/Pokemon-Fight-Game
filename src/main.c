@@ -39,7 +39,6 @@ void setupIO();
 int isInside(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint16_t px, uint16_t py);
 void enablePullUp(GPIO_TypeDef *Port, uint32_t BitNumber);
 void pinMode(GPIO_TypeDef *Port, uint32_t BitNumber, uint32_t Mode);
-void initADC();
 int button_pressed();
 void select_pika();
 int move_up_func(void);
@@ -51,6 +50,10 @@ void charm_moves();
 void playTune(uint32_t [], uint32_t [], int);
 void cpu_choose_move();
 void pika_health();
+void randomize(void);
+uint32_t prbs(void);
+void initADC(void);
+int readADC(void);
 
 
 
@@ -126,6 +129,8 @@ const uint16_t dg1[]=
 
 
 int pikachu_health = 100;
+// for random numbers
+uint32_t shift_register=0;
 
 
 
@@ -140,13 +145,18 @@ int main()
 	uint16_t y = 50;
 	uint16_t oldx = x;
 	uint16_t oldy = y;
+	uint8_t playerX = 15;
+	uint8_t playerY = 70;
+	uint8_t cpuX = SCREENWIDTH-SPRITESIZE-playerX; // mirrored 
+	uint8_t cpuY = playerX;
+	uint8_t spacing = 5; // space between users sprite and menu
+	uint8_t menuThickness = 2;
 
 	// When changing the notes, check for the duration of each note (in milliseconds)
 	uint32_t pokemon_battle_theme[] = { AS4_Bb4, F4, DS4_Eb4, F4, AS4_Bb4, F4, DS4_Eb4, F4, 
 		AS4_Bb4, DS5_Eb5, CS5_Db5, AS4_Bb4, GS4_Ab4, F4, DS4_Eb4, C4};
 	uint32_t theme_durations[] = { 150, 150, 150, 150, 150, 150, 150, 150,
 		300, 300, 300, 300, 300, 300, 300, 300};
-	initADC();
 	
 
 	const uint16_t *userSprite = 0;
@@ -158,6 +168,7 @@ int main()
 	initSysTick();
 	setupIO();
 	initSerial();
+	initADC();
 	
 	playNote(10000);
 	
@@ -166,18 +177,8 @@ int main()
 	// plays the tune
 	// commented out until we figure out how to play it in the background while the code runs
 	// playTune(pokemon_battle_theme, theme_durations, 16);
-	
-
 	while(1)
 	{
-		int playerX = 15;
-		int playerY = 70;
-		int cpuX = SCREENWIDTH-SPRITESIZE-playerX; // mirrored 
-		int cpuY = playerX;
-		int spacing = 5; // space between users sprite and menu
-		int menuThickness = 2;
-
-
 		// displays the start screen for the user
 		DisplayStartScreen();
 
@@ -187,22 +188,17 @@ int main()
 		// the pointer to sprite chosen by cpu
 		cpuSprite = CpuChoosePokemon(userSprite);
 		
-		// checking if it works. 
-		putImage(playerX, playerY, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);// can be altered or deleted 
-		putImage(cpuX, cpuY, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);// can be altered or deleted
-		putImage(20, 80, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);// can be altered or deleted 
-		putImage(80, 20, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);// can be altered or deleted
-		DrawMenuFrame(5, 80+32, 2, RGBToWord(255,50,0));//draw menu function
-		
-		
-
-			
+		// Drawing pokemon
+		putImage(playerX, playerY, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);
+		putImage(cpuX, cpuY, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);
 		
 		//loops menu options
 		while(1)
 		{
-			DrawMenuFrame(spacing, playerY+SPRITESIZE+spacing, menuThickness, RGBToWord(255,50,0));//draw menu function
+			// draw menu
+			DrawMenuFrame(spacing, playerY+SPRITESIZE+spacing, menuThickness, RGBToWord(255,50,0));
 
+			// chose ability
 			move_down_func();
 
 			//checks what pokemon user choose to determine move set
@@ -218,83 +214,65 @@ int main()
 			{
 				charm_moves();                   
 				select_charmder();
+				cpu_choose_move();
 			}
-			
-
-
-
 		}
-
-		// while (1)
-		// sh
-		// 	hmoved = vmoved = 0;
-		// 	hinverted = vinverted = 0;
-		// 	if ((GPIOB->IDR & (1 << 4)) == 0) // right pressed
-		// 	{					
-		// 		if (x < 110)
-		// 		{
-		// 			x = x + 1;
-		// 			hmoved = 1;
-		// 			hinverted = 0;
-		// 		}						
-		// 	}
-		// 	if ((GPIOB->IDR & (1 << 5)) == 0) // left pressed
-		// 	{				
-		// 		if (x > 10)
-		// 		{
-		// 			x = x - 1;
-		// 			hmoved = 1;
-		// 			hinverted = 1;
-		// 		}			
-		// 	}
-		// 	if ( (GPIOA->IDR & (1 << 11)) == 0) // down pressed
-		// 	{
-		// 		if (y < 140)
-		// 		{
-		// 			y = y + 1;			
-		// 			vmoved = 1;
-		// 			vinverted = 0;
-		// 		}
-		// 	}
-		// 	if ( (GPIOA->IDR & (1 << 8)) == 0) // up pressed
-		// 	{			
-		// 		if (y > 16)
-		// 		{
-		// 			y = y - 1;
-		// 			vmoved = 1;
-		// 			vinverted = 1;
-		// 		}
-		// 	}
-		// 	if ((vmoved) || (hmoved))
-		// 	{
-		// 		// only redraw if there has been some movement (reduces flicker)
-		// 		fillRectangle(oldx,oldy,12,16,0);
-		// 		oldx = x;
-		// 		oldy = y;					
-		// 		if (hmoved)
-		// 		{
-		// 			if (toggle)
-		// 				putImage(x,y,12,16,deco1,hinverted,0);
-		// 			else
-		// 				putImage(x,y,12,16,deco2,hinverted,0);
-
-		// 			toggle = toggle ^ 1;
-		// 		}
-		// 		else
-		// 		{
-		// 			putImage(x,y,12,16,deco3,0,vinverted);
-		// 		}
-		// 		// Now check for an overlap by checking to see if ANY of the 4 corners of deco are within the target area
-		// 		if (isInside(20,80,12,16,x,y) || isInside(20,80,12,16,x+12,y) || isInside(20,80,12,16,x,y+16) || isInside(20,80,12,16,x+12,y+16) )
-		// 		{
-		// 			printTextX2("GLUG!", 10, 20, RGBToWord(0xff,0xff,0), 0);
-		// 		}
-		// 	}	
-
-		// 	delay(50);
-		// }
 	}
 	return 0;
+}
+
+void initADC()
+{	
+	// Turn on ADC 
+	RCC->APB2ENR |= (1 << 9);		
+    // Enable the reference voltage
+	ADC->CCR |= (1 << 22);	
+	// Begin ADCCalibration	
+	ADC1->CR = ( 1 << 31);
+	// Wait for calibration complete:  
+	while ((ADC1->CR & ( 1 << 31)));
+	// Select Channel 7
+	ADC1->CR |= (1 << 7);	
+	// Enable the ADC
+	ADC1->CR |= (1 << 0);  
+}
+
+int readADC()
+{
+	// Trigger a conversion
+	ADC1->CR |=  (1 << 2);
+	// Wait for End of Conversion
+	while ( (ADC1->CR & 1 << 2));
+	// return result
+	return ADC1->DR;
+}
+
+void randomize(void)
+{
+	shift_register = 0;
+    // uses ADC noise values to seed the shift_register
+    while(shift_register==0)
+    {
+        for (int i=0;i<10;i++)
+        {
+            shift_register+=(readADC()<<i);
+        }
+    }
+}
+
+uint32_t prbs(void)
+{
+	// This is an unverified 31 bit PRBS generator
+	// It should be maximum length but this has not been verified 
+	unsigned long new_bit=0;	
+
+    new_bit= ((shift_register & (1<<27))>>27) ^ ((shift_register & (1<<30))>>30);
+    new_bit= ~new_bit;
+    new_bit = new_bit & 1;
+    shift_register=shift_register << 1;
+    shift_register=shift_register | (new_bit);
+		
+	return shift_register & 0x7fffffff; // return 31 LSB's 
 }
 
 // display start screen and wait for player's input
@@ -345,7 +323,6 @@ void DisplayStartScreen()
         }
         delay(10);
     }
-	
 }
 
 // let player choose a pokemon to play
@@ -365,7 +342,7 @@ const uint16_t *UserChoosePokemon()
 	// button space between circle and filled circle when the button is pressed
 	uint8_t pressedButtonSpacing = buttonSpacing - 2;
 	// delay after button is pressed
-	uint8_t buttonDelay = 200;
+	uint16_t buttonDelay = 200;
 	// thickness of the menu
 	uint8_t menuThickness = 2;
 	// color of menu and text
@@ -576,8 +553,6 @@ void enablePullUp(GPIO_TypeDef *Port, uint32_t BitNumber)
 }
 void pinMode(GPIO_TypeDef *Port, uint32_t BitNumber, uint32_t Mode)
 {
-	/*
-	*/
 	uint32_t mode_value = Port->MODER;
 	Mode = Mode << (2 * BitNumber);
 	mode_value = mode_value & ~(3u << (BitNumber * 2));
@@ -615,25 +590,24 @@ void setupIO()
 }
 
 
-void initADC()
-{
-	// Turn on ADC 
-	RCC->APB2ENR |= (1 << 9);		
-    // Enable the reference voltage
-	ADC->CCR |= (1 << 22);	
-	// Begin ADCCalibration	
-	ADC1->CR = ( 1 << 31);
-	// Wait for calibration complete:  
-	while ((ADC1->CR & ( 1 << 31)));
-	// Select Channel 7
-	ADC1->CR |= (1 << 7);	
-	// Enable the ADC
-	ADC1->CR |= (1 << 0);  
-}
+// void initADC()
+// {
+// 	// Turn on ADC 
+// 	RCC->APB2ENR |= (1 << 9);		
+//     // Enable the reference voltage
+// 	ADC->CCR |= (1 << 22);	
+// 	// Begin ADCCalibration	
+// 	ADC1->CR = ( 1 << 31);
+// 	// Wait for calibration complete:  
+// 	while ((ADC1->CR & ( 1 << 31)));
+// 	// Select Channel 7
+// 	ADC1->CR |= (1 << 7);	
+// 	// Enable the ADC
+// 	ADC1->CR |= (1 << 0);  
+// }
 
 void select_pika()//selects pokemon move
 {
-	
 	uint16_t color = RGBToWord(255,50,0);
 	int choice = move_down_func();//storing the users choice
 
@@ -692,8 +666,6 @@ void select_pika()//selects pokemon move
 			break;
 		}
 	}
-		
-
 }
 
 
@@ -702,8 +674,6 @@ void select_pika()//selects pokemon move
 //function to move down the button options
 int move_down_func(void)
 {
-	
-
 	static int move_down = 1;  
 	
 
@@ -727,12 +697,10 @@ int move_down_func(void)
 	// draw the new arrow at the selected position
 	putImage(X, START + (move_down - 1) * INC, 10, 10, select_arrow, 0, 0);
 
-
 	delay(120);  //delay for asthetics
+
 	return move_down;//returnimg current arrow position
-
 }
-
 
 void pika_moves()//pikachu move set
 {
@@ -748,7 +716,6 @@ void pika_moves()//pikachu move set
 	printText(Heal_mv_txt, 75, 146, color, 0);
 
 }
-
 
 void charm_moves()//charmander move set
 {
@@ -828,7 +795,6 @@ void select_charmder()//removable if any of you find a better solution
 		
 
 }
-	
 
 void playTune(uint32_t notes[], uint32_t durations[], int count)
 {
@@ -842,7 +808,6 @@ void playTune(uint32_t notes[], uint32_t durations[], int count)
 		index++;
 	}
 }
-
 
 void cpu_choose_move()
 {
