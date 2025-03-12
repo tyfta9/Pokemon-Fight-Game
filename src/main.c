@@ -190,7 +190,7 @@ int main()
 				//pika health
 				pika_moves();//draws pika's moves
 				select_pika();
-				cpu_choose_move();
+				cpu_choose_move();//cpu chooes move
 				
 			}
 			else
@@ -687,7 +687,7 @@ int move_down_func(void)
 	
 
 	// puts arrow at start move
-	if ((GPIOA->IDR & (1 << 11)) == 0) 
+	if ((GPIOA->IDR & (1 << 11)) == 0)//check if down button pressed
 	{
 		delay(500);  //stops multiple button presses
 
@@ -823,7 +823,7 @@ void playTune(uint32_t notes[], uint32_t durations[], int count)
 }
 
 
-void cpu_choose_move()
+void cpu_choose_move()//function for selecting cpu's move
 {
 	int move_choice = 0;
 	uint16_t color = RGBToWord(255,50,0);
@@ -832,7 +832,7 @@ void cpu_choose_move()
 	move_choice = (rand() % CPU_MOVE_CHOICE) + 1;
 
 
-	if(((GPIOB->IDR & (1 << 4)) == 0) )
+	if(((GPIOB->IDR & (1 << 4)) == 0) )//check if right button pressed
 	{
 		delay(500);//stops extra input
 		char *promt1 = "Char used Scratch!";
@@ -891,7 +891,7 @@ void cpu_choose_move()
 
 
 
-void pika_health()
+void pika_health()//potential function for handaling pikachus health animations
 {
 	
 
