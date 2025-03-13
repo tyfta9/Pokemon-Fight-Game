@@ -705,7 +705,7 @@ int move_down_func(void)
 void pika_moves()//pikachu move set
 {
 	uint16_t color = RGBToWord(255,50,0);
-	fillRectangle(50,20,20,10,color);
+	fillRectangle(8,55,55,5,color);
 	char *scratch_mv_txt = "Scratch";
 	char *Heal_mv_txt = "Heal";
 	char *Spark_mv_txt = "Thunder";
