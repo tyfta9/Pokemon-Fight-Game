@@ -43,7 +43,6 @@ int button_pressed();
 void select_pika();
 int move_up_func(void);
 int move_down_func(void);
-void scratch();
 void pika_moves();
 void select_charmder();
 void charm_moves();
@@ -54,6 +53,7 @@ void randomize(void);
 uint32_t prbs(void);
 void initADC(void);
 int readADC(void);
+int scratch();
 
 
 
@@ -143,6 +143,10 @@ const uint16_t dg1[]=
 
 
 int pikachu_health = 100;
+int charmander_health = 100;
+
+const uint16_t *userSprite = 0;
+const uint16_t *cpuSprite = 0;
 // for random numbers
 uint32_t shift_register=0;
 
@@ -173,8 +177,7 @@ int main()
 		300, 300, 300, 300, 300, 300, 300, 300};
 	
 
-	const uint16_t *userSprite = 0;
-	const uint16_t *cpuSprite = 0;
+	
 	uint16_t color = RGBToWord(255,50,0);
 
 	
@@ -197,6 +200,7 @@ int main()
 		// displays the start screen for the user
 		DisplayStartScreen();
 
+		// keep coding using those values as if
 		// userSprite is a pointer to the sprite chosen by the player
 		userSprite = UserChoosePokemon();
 		// the pointer to sprite chosen by cpu
@@ -765,7 +769,7 @@ int move_down_func(void)
 void pika_moves()//pikachu move set
 {
 	uint16_t color = RGBToWord(255,50,0);
-	fillRectangle(8,55,55,5,color);
+	fillRectangle(8,55,55,5,color);//draws health bar
 	char *scratch_mv_txt = "Scratch";
 	char *Heal_mv_txt = "Heal";
 	char *Spark_mv_txt = "Thunder";
@@ -869,10 +873,6 @@ void playTune(uint32_t notes[], uint32_t durations[], int count)
 	}
 }
 
-<<<<<<< HEAD
-
-void cpu_choose_move()//function for selecting cpu's move
-=======
 void playBackgroundTune(uint32_t * notes, uint32_t * times, uint32_t count, uint32_t repeat)
 {
 	background_tune_notes=notes;
@@ -882,7 +882,6 @@ void playBackgroundTune(uint32_t * notes, uint32_t * times, uint32_t count, uint
 }
 
 void cpu_choose_move()
->>>>>>> 871200c97e4a1a8825f94e25ca6d78d9d3d01c7d
 {
 	int move_choice = 0;
 	uint16_t color = RGBToWord(255,50,0);
@@ -952,11 +951,36 @@ void cpu_choose_move()
 
 void pika_health()//potential function for handaling pikachus health animations
 {
+	if(scratch())
+	{
+		fillRectangle(8,55,55,5,0x0);//draws health ba
+
+	}
 	
 
 
 
 }
+
+int scratch()//function for scratch attack
+{
+	if(userSprite == pikachu)
+	{
+		//damage charmaders health
+		charmander_health - 20;
+		
+
+	}
+	else
+	{
+		pika_health - 20;
+	}
+
+
+	return 1;
+}
+
+
 
 
 
