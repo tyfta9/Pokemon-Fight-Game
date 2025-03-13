@@ -60,6 +60,8 @@ int readADC(void);
 // display start screen for user
 void DisplayStartScreen(void);
 
+// play tune in the background
+void playBackgroundTune(uint32_t *, uint32_t *, uint32_t, uint32_t);
 
 // let player choose a pokemon to play
 // should return pointer to the sprite player has chosen
@@ -72,6 +74,16 @@ void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t menuThickness, 
 uint32_t GetRandom(uint32_t max);
 
 volatile uint32_t milliseconds;
+
+uint32_t my_tune_notes[]={ AS4_Bb4, F4, DS4_Eb4, F4, AS4_Bb4, F4, DS4_Eb4, F4, 
+						AS4_Bb4, DS5_Eb5, CS5_Db5, AS4_Bb4, GS4_Ab4, F4, DS4_Eb4, C4};
+uint32_t my_tune_times[]={ 150, 150, 150, 150, 150, 150, 150, 150,
+	300, 300, 300, 300, 300, 300, 300, 300};
+// global variables to play the tune
+uint32_t * background_tune_notes=0;
+uint32_t * background_tune_times;
+uint32_t background_note_count;
+uint32_t background_tune_repeat;
 
 // pokemon sprites (all pokemons belong to the pokemon company)
 const uint16_t pikachu[]=
@@ -523,6 +535,37 @@ void initSysTick(void)
 	SysTick->CTRL = 7;
 	SysTick->VAL = 10;
 	__asm(" cpsie i "); // enable interrupts
+
+
+	static int index = 0;
+	static int current_note_time=0;
+	milliseconds++;
+	if (background_tune_notes != 0)
+	{
+		if (current_note_time == 0)
+		{
+			index++;
+			if (index >= background_note_count)
+			{
+				if (background_tune_repeat != 0)
+				{
+					index = 0;
+				}
+				else
+				{
+					background_tune_notes=0;
+					playNote(0);
+				}
+			}
+			current_note_time = background_tune_times[index];
+			playNote(background_tune_notes[index]);
+		}
+		else
+		{
+			current_note_time--;
+		}
+	}
+
 }
 void SysTick_Handler(void)
 {
@@ -826,8 +869,20 @@ void playTune(uint32_t notes[], uint32_t durations[], int count)
 	}
 }
 
+<<<<<<< HEAD
 
 void cpu_choose_move()//function for selecting cpu's move
+=======
+void playBackgroundTune(uint32_t * notes, uint32_t * times, uint32_t count, uint32_t repeat)
+{
+	background_tune_notes=notes;
+	background_tune_times=times;
+	background_note_count=count;
+	background_tune_repeat=repeat;
+}
+
+void cpu_choose_move()
+>>>>>>> 871200c97e4a1a8825f94e25ca6d78d9d3d01c7d
 {
 	int move_choice = 0;
 	uint16_t color = RGBToWord(255,50,0);
