@@ -75,6 +75,7 @@ uint32_t GetRandom(uint32_t max);
 
 volatile uint32_t milliseconds;
 
+//
 uint32_t my_tune_notes[]={ AS4_Bb4, F4, DS4_Eb4, F4, AS4_Bb4, F4, DS4_Eb4, F4, 
 						AS4_Bb4, DS5_Eb5, CS5_Db5, AS4_Bb4, GS4_Ab4, F4, DS4_Eb4, C4};
 uint32_t my_tune_times[]={ 150, 150, 150, 150, 150, 150, 150, 150,
@@ -194,6 +195,9 @@ int main()
 	// playTune(pokemon_battle_theme, theme_durations, 16);
 	while(1)
 	{
+		// plays the tune
+		playBackgroundTune(my_tune_notes,my_tune_times,3,1);
+
 		// displays the start screen for the user
 		DisplayStartScreen();
 
@@ -536,7 +540,9 @@ void initSysTick(void)
 	SysTick->VAL = 10;
 	__asm(" cpsie i "); // enable interrupts
 
-
+}
+void SysTick_Handler(void)
+{
 	static int index = 0;
 	static int current_note_time=0;
 	milliseconds++;
@@ -565,11 +571,6 @@ void initSysTick(void)
 			current_note_time--;
 		}
 	}
-
-}
-void SysTick_Handler(void)
-{
-	milliseconds++;
 }
 void initClock(void)
 {
@@ -869,6 +870,7 @@ void playTune(uint32_t notes[], uint32_t durations[], int count)
 	}
 }
 
+//
 void playBackgroundTune(uint32_t * notes, uint32_t * times, uint32_t count, uint32_t repeat)
 {
 	background_tune_notes=notes;
