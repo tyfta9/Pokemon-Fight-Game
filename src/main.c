@@ -68,6 +68,8 @@ const uint16_t *UserChoosePokemon();
 const uint16_t *CpuChoosePokemon(const uint16_t *userSprite);
 // draw the menu frame, top line and bottom line
 void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t menuThickness, uint16_t menuColor);
+// get random number from zero to specified max value
+uint32_t GetRandom(uint32_t max);
 
 volatile uint32_t milliseconds;
 
@@ -173,6 +175,7 @@ int main()
 	playNote(10000);
 	
 	initSound();
+	randomize();
 
 	// plays the tune
 	// commented out until we figure out how to play it in the background while the code runs
@@ -182,7 +185,6 @@ int main()
 		// displays the start screen for the user
 		DisplayStartScreen();
 
-		// keep coding using those values as if
 		// userSprite is a pointer to the sprite chosen by the player
 		userSprite = UserChoosePokemon();
 		// the pointer to sprite chosen by cpu
@@ -273,6 +275,21 @@ uint32_t prbs(void)
     shift_register=shift_register | (new_bit);
 		
 	return shift_register & 0x7fffffff; // return 31 LSB's 
+}
+
+// get random number from zero to the stated max value
+uint32_t GetRandom(uint32_t max)
+{
+	uint32_t num = 0;
+	
+	for(int i = 0; i < 10; i++)
+	{
+		num = prbs();
+		num = num >> 5;
+		num = num & max;
+		printDecimal(num);
+		eputs(" ");
+	}
 }
 
 // display start screen and wait for player's input
