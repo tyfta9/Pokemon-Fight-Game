@@ -47,13 +47,20 @@ void pika_moves();
 void select_charmder();
 void charm_moves();
 void playTune(uint32_t [], uint32_t [], int);
-void cpu_choose_move();
-void pika_health();
+void cpu_choose_move_char();
+void cpu_choose_move_pika();
+void pika_health_animation();
+void char_health_animation();
+void print_pokemon_status_bar();
 void randomize(void);
 uint32_t prbs(void);
 void initADC(void);
 int readADC(void);
-int scratch();
+void scratch(int);
+void thunder(int);
+void ember(int);
+void heal(int);
+void game_loop();
 
 
 
@@ -142,11 +149,12 @@ const uint16_t dg1[]=
 };
 
 
-int pikachu_health = 100;
-int charmander_health = 100;
+int pikachu_health = 80;
+int charmander_health = 80;
 
-const uint16_t *userSprite = 0;
-const uint16_t *cpuSprite = 0;
+const uint16_t *userSprite = 0;//stores the users sprit choixe
+const uint16_t *cpuSprite = 0;//stores cpu spritte choice
+
 // for random numbers
 uint32_t shift_register=0;
 
@@ -209,34 +217,45 @@ int main()
 		// Drawing pokemon
 		putImage(playerX, playerY, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);
 		putImage(cpuX, cpuY, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);
+		DrawMenuFrame(spacing, playerY+SPRITESIZE+spacing, menuThickness, RGBToWord(255,50,0));
+
 		
-		//loops menu options
-		while(1)
-		{
-			// draw menu
-			DrawMenuFrame(spacing, playerY+SPRITESIZE+spacing, menuThickness, RGBToWord(255,50,0));
-
-			// chose ability
-			move_down_func();
-
-			//checks what pokemon user choose to determine move set
-			if(userSprite == pikachu)
-			{
-				//pika health
-				pika_moves();//draws pika's moves
-				select_pika();
-				cpu_choose_move();//cpu chooes move
-				
-			}
-			else
-			{
-				charm_moves();                   
-				select_charmder();
-				cpu_choose_move();
-			}
-		}
+		
+		game_loop();//runs the game until end condition is met
+		
 	}
 	return 0;
+}
+
+//funtion for running gameplay
+void game_loop()
+{
+	while(1)
+	{
+		print_pokemon_status_bar();// draws the status bars for each pokemon
+
+	
+		move_down_func();
+
+		//checks what pokemon user choose to determine move set
+		if(userSprite == pikachu)
+		{
+			
+			pika_moves();//draws pika's moves
+
+			select_pika();//selects move choice
+
+			cpu_choose_move_char();//cpu chooes move
+			
+		}
+		else
+		{
+			charm_moves();                   
+			select_charmder();
+			cpu_choose_move_pika();
+		}
+	}
+
 }
 
 void initADC()
@@ -517,6 +536,7 @@ const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 	return 0;
 }
 
+
 // draw the menu frame, x and y position is top left corner of the menu
 void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t menuThickness, uint16_t menuColor)
 {
@@ -654,35 +674,19 @@ void setupIO()
 }
 
 
-// void initADC()
-// {
-// 	// Turn on ADC 
-// 	RCC->APB2ENR |= (1 << 9);		
-//     // Enable the reference voltage
-// 	ADC->CCR |= (1 << 22);	
-// 	// Begin ADCCalibration	
-// 	ADC1->CR = ( 1 << 31);
-// 	// Wait for calibration complete:  
-// 	while ((ADC1->CR & ( 1 << 31)));
-// 	// Select Channel 7
-// 	ADC1->CR |= (1 << 7);	
-// 	// Enable the ADC
-// 	ADC1->CR |= (1 << 0);  
-// }
-
 void select_pika()//selects pokemon move
 {
 	uint16_t color = RGBToWord(255,50,0);
-	int choice = move_down_func();//storing the users choice
+	int choice = move_down_func();//storing the users move choice
 
-	if(((GPIOB->IDR & (1 << 4)) == 0) )//right button presssed
+	if(((GPIOB->IDR & (1 << 4)) == 0) )//checks if right button presssed
 	{
 		delay(500);//stops extra input
 		char *prompt1 = "Pika used Scratch!";
 		char *prompt2  = "Pika used Thunder!";
 		char *prompt3 = "Pika used Heal!";
-		int width = 125;
-		int height =40;
+		int width = 125;//for menu erasure
+		int height =40; //for menu erasure
 
 		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow drawn by move down func
 
@@ -690,20 +694,31 @@ void select_pika()//selects pokemon move
 		{
 		case 1:
 
-			fillRectangle(X, 115, width, height, 0x0);//erases moves
+			fillRectangle(X, 115, width, height, 0x0);//erases pokemon moves
+
 			printText(prompt1, 4, 126, color, 0);
+
+			scratch(1);//call scratch func to dammage opponent(1-damages cpu's pokemon)
+
 			MessageLog(prompt1); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
 				//wait
 			}
+
 			fillRectangle(4, 115, width, height, 0x0);//erases promt
+
 			break;
 
 		case 2:
+
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+
 			printText(prompt2, 4, 126, color, 0);
+
+			thunder(1);//call thunder func to dammage opponent(1-damages cpu's pokemon)
+
 			MessageLog(prompt2); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
@@ -713,9 +728,12 @@ void select_pika()//selects pokemon move
 			fillRectangle(4, 115, width, height, 0x0);//erases promt
 			break;
 		
-			case 3:
+		case 3:
+
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+
 			printText(prompt3, 4, 126, color, 0);
+			//call heal-not yet done
 			MessageLog(prompt3); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
@@ -769,12 +787,10 @@ int move_down_func(void)
 void pika_moves()//pikachu move set
 {
 	uint16_t color = RGBToWord(255,50,0);
-	fillRectangle(8,55,55,5,color);//draws health bar
 	char *scratch_mv_txt = "Scratch";
 	char *Heal_mv_txt = "Heal";
 	char *Spark_mv_txt = "Thunder";
-
-
+	
 	printText(scratch_mv_txt, 75, 118, color, 0);
 	printText(Spark_mv_txt, 75, 132, color, 0);
 	printText(Heal_mv_txt, 75, 146, color, 0);
@@ -784,10 +800,10 @@ void pika_moves()//pikachu move set
 void charm_moves()//charmander move set
 {
 	uint16_t color = RGBToWord(255,50,0);
+	
 	char *scratch_mv_txt = "Scratch";
 	char *Heal_mv_txt = "Heal";
 	char *Spark_mv_txt = "Ember";
-
 
 	printText(scratch_mv_txt, 75, 118, color, 0);
 	printText(Spark_mv_txt, 75, 132, color, 0);
@@ -795,7 +811,7 @@ void charm_moves()//charmander move set
 
 }
 
-void select_charmder()//removable if any of you find a better solution
+void select_charmder()//func to select moves when user plays as charmander
 {
 	uint16_t color = RGBToWord(255,50,0);
 	int choice = move_down_func();//storing the users choice
@@ -816,7 +832,11 @@ void select_charmder()//removable if any of you find a better solution
 		case 1:
 
 			fillRectangle(X, 115, width, height, 0x0);//erases moves
+
 			printText(prompt1, 4, 126, color, 0);
+
+			scratch(1);//call scratch func to dammage opponent(1-damages cpu's pokemon)
+
 			MessageLog(prompt1); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
@@ -827,8 +847,13 @@ void select_charmder()//removable if any of you find a better solution
 			break;
 
 		case 2:
+
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+
 			printText(prompt2, 4, 126, color, 0);
+
+			ember(1);//call ember func to dammage opponent(1-damages cpu's pokemon)
+
 			MessageLog(prompt2); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
@@ -842,6 +867,7 @@ void select_charmder()//removable if any of you find a better solution
 			case 3:
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
 			printText(prompt3, 4, 126, color, 0);
+			//call heal func - not yet done
 			MessageLog(prompt3); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
@@ -881,13 +907,13 @@ void playBackgroundTune(uint32_t * notes, uint32_t * times, uint32_t count, uint
 	background_tune_repeat=repeat;
 }
 
-void cpu_choose_move()
+void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 {
 	int move_choice = 0;
 	uint16_t color = RGBToWord(255,50,0);
 
 
-	move_choice = (rand() % CPU_MOVE_CHOICE) + 1;
+	move_choice = (rand() % CPU_MOVE_CHOICE) + 1;//getting random number between 1=3
 
 
 	if(((GPIOB->IDR & (1 << 4)) == 0) )//check if right button pressed
@@ -906,7 +932,10 @@ void cpu_choose_move()
 		case 1:
 
 			fillRectangle(X, 115, width, height, 0x0);//erases moves
+
 			printText(promt1, 4, 126, color, 0);
+
+			scratch(2);//call scratch func to dammage opponent(2-damages user pokemon)
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
@@ -916,8 +945,12 @@ void cpu_choose_move()
 			break;
 
 		case 2:
+
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+
 			printText(prompt2, 4, 126, color, 0);
+
+			ember(2);//call ember func to dammage opponent(2-damages user's pokemon)
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
@@ -927,8 +960,84 @@ void cpu_choose_move()
 			break;
 
 
-			case 3:
+		case 3:
+
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+			//call heal func
+			printText(prompt3, 4, 126, color, 0);
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+			
+		
+		default:
+			return -1;//error
+			break;
+		}
+	}
+}
+
+void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
+{
+
+	int move_choice = 0;
+	uint16_t color = RGBToWord(255,50,0);
+
+
+	move_choice = (rand() % CPU_MOVE_CHOICE) + 1;//getting random number between 1=3
+
+	if(((GPIOB->IDR & (1 << 4)) == 0) )//check if right button pressed
+	{
+		delay(500);//stops extra input
+		char *promt1 = "Pika used Scratch!";
+		char *prompt2  = "Pika used Thunder!";
+		char *prompt3 = "Pika used Heal!";
+		int width = 125;
+		int height =40;
+
+		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow draw by move down func
+
+		switch (move_choice)
+		{
+		case 1:
+
+			fillRectangle(X, 115, width, height, 0x0);//erases moves
+
+			printText(promt1, 4, 126, color, 0);
+
+			scratch(2);//call scratch func to dammage opponent(2-damages user's pokemon)
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+
+		case 2:
+
+			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+
+			printText(prompt2, 4, 126, color, 0);
+
+			thunder(2);//call thunder func to dammage opponent(2-damages user's pokemon)
+
+			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
+			{
+				//wait
+			}
+			fillRectangle(4, 115, width, height, 0x0);//erases promt
+			break;
+
+
+		case 3:
+
+			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+
 			printText(prompt3, 4, 126, color, 0);
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
@@ -949,35 +1058,227 @@ void cpu_choose_move()
 
 
 
-void pika_health()//potential function for handaling pikachus health animations
+void pika_health_animation()//func handaling pikachus health bar animations
 {
-	if(scratch())
+
+	int width = (45*pikachu_health)/80;//sets bar widh based on pikachu's current health
+	uint16_t color_health_bar = RGBToWord(0,255,0);
+
+	fillRectangle(80,81.5,45,3.5,0x0);//erases previous hp bar
+
+	fillRectangle(80,81.5,width,3.5,color_health_bar);//draws new hp bar
+
+}
+
+
+
+void scratch(int attaker)//scratch attack func takes in who is attaking as a parameter 1 = user attack 2 = cpu attack
+{
+	switch (attaker)
 	{
-		fillRectangle(8,55,55,5,0x0);//draws health ba
+		case 1: //user attacking cpu
 
+			if (charmander_health <= 0)//stops health bar overflow
+			{
+				break;
+			}
+			else
+			{
+				charmander_health = charmander_health - 10;
+
+				char_health_animation();
+			}
+
+			break;
+
+		case 2: //cpu attaking user
+
+			if (pikachu_health <= 0)//stops health bar overflow
+			{
+				break;
+			}
+			else
+			{
+				pikachu_health = pikachu_health - 10;
+
+				pika_health_animation();
+
+			}
+			break;
+				
+			
+
+		default:
+			break;
 	}
-	
+}
 
+
+void thunder(int attaker)//thunder attack func takes in who is attaking as a parameter 1 = user attack 2 = cpu attack
+{
+	switch (attaker)
+	{
+		case 1: //user attacking cpu
+
+			if (charmander_health <= 0)//prevents hp bar overflow
+			{
+				break;
+			}
+			else
+			{
+				charmander_health = charmander_health - 15;
+
+				char_health_animation();
+
+			}
+			break;
+
+		case 2: //cpu attacking user
+
+			if (pikachu_health <= 0)//prevents hp bar overflow
+			{
+				break;
+			}
+			else
+			{
+				pikachu_health = pikachu_health - 15;
+
+				pika_health_animation();
+			
+			}
+			
+			
+			
+
+		default:
+			break;
+	}
+}
+
+void heal(int attaker)//funfion to heal pokemon-not yet done
+
+{
+	charmander_health = charmander_health + 10;
 
 
 }
 
-int scratch()//function for scratch attack
+void ember(int attaker)
 {
+	switch (attaker)
+	{
+		case 1: //pikachu attaking charmander
+
+			if (charmander_health <= 0)
+			{
+				break;
+
+			}
+			else
+			{
+				charmander_health = charmander_health - 15;
+				char_health_animation();
+			}
+			
+			
+			
+			break;
+
+		case 2: //cpu(pikachu) attacking charmander
+			if (pikachu_health <= 0)
+			{
+				break;
+			}
+			else
+			{
+				pikachu_health = pikachu_health - 15;
+				pika_health_animation();
+			}
+			
+			
+			
+
+		default:
+			break;
+	}
+
+}
+
+
+
+void char_health_animation()//handales charmanders health animation
+{
+	int width = (45*charmander_health)/80;
+	// uint16_t color = RGBToWord(255,50,0);
+	uint16_t color_health_bar = RGBToWord(0,255,0);
+
+	
+
+	fillRectangle(22,31.5,45,3.5,0x0);//erases previous hp bar
+	fillRectangle(22,31.5,width,3.5,color_health_bar);//draws new hp bar
+
+}
+
+
+
+
+void print_pokemon_status_bar()//outputs graphics foe pokemon health bar
+{
+	uint16_t color_poke_name = RGBToWord(160,30,0);
+	uint16_t color_health_bar = RGBToWord(0,255,0);
+	uint16_t color = RGBToWord(255,50,0);
+	char *pokemon_name_pika = "Pikachu";
+	char *pokemon_name_char = "Charmander";
+	char *hp = "HP:";
+	int width = (45*charmander_health)/80;
+	int witdh_pika = (45*pikachu_health)/80;
+
 	if(userSprite == pikachu)
 	{
-		//damage charmaders health
-		charmander_health - 20;
+
 		
+	
+
+		//draw pikacju's staus
+		
+		fillRectangle(80,81.5,witdh_pika,3.5,color_health_bar);//draws health bar for pikachu
+		fillRectangle(58,90,67,1.5,color);//draws line under h bar or pikachu
+		printText(pokemon_name_pika, 60,65,color_poke_name, 0);//prints out pokemon name or pikachu
+		printText(hp,60,79.5,color_poke_name, 0);//prints out hp label or pikachu
+		
+		//end
+
+
+	
+		//Draw charmader status
+		fillRectangle(22,31.5,width,3.5,color_health_bar);//draws health bar for charmander
+		fillRectangle(3,40,67,1.5,color);//draws line under h bar or charmander
+		printText(pokemon_name_char, 5,13,color_poke_name, 0);//prints out pokemon name or charmander
+		printText(hp,3,30,color_poke_name, 0);//prints out hp label or charmander
+		//end
 
 	}
 	else
 	{
-		pika_health - 20;
+
+		
+
+		//Draw charmader status
+		fillRectangle(22,31.5,width,3.5,color_health_bar);//draws health bar for charmander
+		fillRectangle(3,40,67,1.5,color);//draws line under h bar or charmander
+		printText(pokemon_name_pika, 5,13,color_poke_name, 0);//prints out pokemon name or charmander
+		printText(hp,3,30,color_poke_name, 0);//prints out hp label or charmander
+		//end
+
+
+		//draw pikachu's staus
+		fillRectangle(80,81.5,witdh_pika,3.5,color_health_bar);//draws health bar for pikachu
+		fillRectangle(58,90,67,1.5,color);//draws line under h bar or pikachu
+		printText(pokemon_name_char, 60,65,color_poke_name, 0);//prints out pokemon name or pikachu
+		printText(hp,60,79.5,color_poke_name, 0);//prints out hp label or pikachu
+		//end
 	}
-
-
-	return 1;
+	
 }
 
 
