@@ -165,9 +165,6 @@ const uint16_t dg1[]=
 	0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,16142,16142,16142,0,0,0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,1994,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,
 };
 
-
-
-
 int pikachu_health = 80;
 int charmander_health = 80;
 
@@ -177,8 +174,6 @@ const uint16_t *cpuSprite = 0;//stores cpu spritte choice
 // for random numbers
 uint32_t shift_register=0;
 
-
-
 int main(void)
 {
 	uint8_t playerX = 15;
@@ -187,7 +182,6 @@ int main(void)
 	uint8_t cpuY = playerX;
 	uint8_t spacing = 5; // space between users sprite and menu
 	uint8_t menuThickness = 2;
-	
 	uint16_t color = RGBToWord(255,50,0);
 
 	
@@ -196,9 +190,6 @@ int main(void)
 	setupIO();
 	initSerial();
 	initADC();
-	
-	playNote(10000);
-	
 	initSound();
 	randomize();
 
@@ -224,7 +215,7 @@ int main(void)
 		// Drawing pokemon
 		putImage(playerX, playerY, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);
 		putImage(cpuX, cpuY, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);
-		DrawMenuFrame(spacing, playerY+SPRITESIZE+spacing, menuThickness, RGBToWord(255,50,0));
+		DrawMenuFrame(spacing, playerY+SPRITESIZE+spacing, menuThickness, color);
 
 		game_loop();//runs the game until end condition is met
 		EndGame();		
@@ -275,7 +266,7 @@ void EndGame(void)
 
 void PrintWin(void)
 {
-	char *message[8] = {{"YOU WON!"}, {"CONGRATS"}, {"YOU DID"}, {"SOMETHING"}, {"HARDER"}, {"THEN"}, {"MAKING"}, {"YOUR BED"}};
+	char *message[8] = {"YOU WON!", "CONGRATS", "YOU DID", "SOMETHING", "HARDER", "THEN", "MAKING", "YOUR BED"};
 	uint8_t messageLen = 8;
 	//uint16_t delayTime = 4;
 	uint16_t color = 0;
@@ -320,7 +311,7 @@ void PrintWin(void)
 
 void PrintLost(void)
 {
-	char *message[8] = {{"HOW COULD"}, {"YOU LOSE"}, {"IT'S SUCH"}, {"A SHAME"}, {"YOU FAILED"}, {"UR TRAINER"}, {"AND YOUR"}, {"BLOOD LINE"}};
+	char *message[8] = {"HOW COULD", "YOU LOSE", "IT'S SUCH", "A SHAME", "YOU FAILED", "UR TRAINER", "AND YOUR", "BLOOD LINE"};
 	uint8_t messageLen = 8;
 	uint16_t color = 0;
 
@@ -460,6 +451,7 @@ uint32_t GetRandom(uint32_t max)
 		printDecimal(num);
 		eputs(" ");
 	}
+	return num;
 }
 
 // display start screen and wait for player's input
@@ -1152,7 +1144,7 @@ void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 			
 		
 		default:
-			return -1;//error
+		// do nothing
 			break;
 		}
 
