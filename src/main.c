@@ -181,13 +181,6 @@ uint32_t shift_register=0;
 
 int main(void)
 {
-	int hinverted = 0;
-	int vinverted = 0;
-	int toggle = 0;
-	int hmoved = 0;
-	int vmoved = 0;
-	uint16_t x = 50;
-	uint16_t y = 50;
 	uint8_t playerX = 15;
 	uint8_t playerY = 70;
 	uint8_t cpuX = SCREENWIDTH-SPRITESIZE-playerX; // mirrored 
@@ -195,6 +188,7 @@ int main(void)
 	uint8_t spacing = 5; // space between users sprite and menu
 	uint8_t menuThickness = 2;
 
+	
 	// When changing the notes, check for the duration of each note (in milliseconds)
 	uint32_t pokemon_battle_theme[] = { AS4_Bb4, F4, DS4_Eb4, F4, AS4_Bb4, F4, DS4_Eb4, F4, 
 		AS4_Bb4, DS5_Eb5, CS5_Db5, AS4_Bb4, GS4_Ab4, F4, DS4_Eb4, C4};
@@ -231,8 +225,6 @@ int main(void)
 		// displays the intro/novel
 		DisplayIntro();
 
-		
-
 		// keep coding using those values as if
 		// userSprite is a pointer to the sprite chosen by the player
 		userSprite = UserChoosePokemon();
@@ -240,9 +232,6 @@ int main(void)
 		cpuSprite = CpuChoosePokemon(userSprite);
 		
 		// Drawing pokemon
-		
-
-		
 		putImage(playerX, playerY, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);
 		putImage(cpuX, cpuY, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);
 		DrawMenuFrame(spacing, playerY+SPRITESIZE+spacing, menuThickness, RGBToWord(255,50,0));
@@ -661,7 +650,6 @@ const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 			if(userSprite != pikachu)
 			{
 				return pikachu;
-
 			}
 			break;
 		// if case is 1 and user have not chosen the same pokemon
@@ -672,24 +660,6 @@ const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 				return charmander;
 
 			}
-			break;
-		// if case is 2 and user have not chosen the same pokemon
-		// return it
-		case 2:
-			if(userSprite != pikachu) //                                            Matter for change if we add more pokemon
-			{
-				return pikachu; //                                            Matter for change if we add more pokemon
-				
-			} 
-			break;
-		// if case is 3 and user have not chosen the same pokemon
-		// return it
-		case 3:
-			if(userSprite != charmander) //                                            Matter for change if we add more pokemon
-			{
-				return charmander; //                                            Matter for change if we add more pokemon
-
-			} 
 			break;
 		default:
 			// do nothing
@@ -722,7 +692,6 @@ void initSysTick(void)
 	SysTick->CTRL = 7;
 	SysTick->VAL = 10;
 	__asm(" cpsie i "); // enable interrupts
-
 }
 
 // // global variables to play the tune
