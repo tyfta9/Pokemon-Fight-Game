@@ -843,7 +843,7 @@ void setupIO()
 	pinMode(GPIOA,0,1); // red LED
 	enablePullUp(GPIOB,4);
 	enablePullUp(GPIOB,5);
-	enablePullUP(GPIOA,1);
+	enablePullUp(GPIOA,1);
 	enablePullUp(GPIOA,11);
 	enablePullUp(GPIOA,8);
 }
