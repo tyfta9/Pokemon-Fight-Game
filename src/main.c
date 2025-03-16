@@ -88,8 +88,8 @@ volatile uint32_t milliseconds;
 //
 uint32_t my_tune_notes[]={ AS4_Bb4, F4, DS4_Eb4, F4, AS4_Bb4, F4, DS4_Eb4, F4, 
 						AS4_Bb4, DS5_Eb5, CS5_Db5, AS4_Bb4, GS4_Ab4, F4, DS4_Eb4, C4};
-uint32_t my_tune_times[]={ 150, 150, 150, 150, 150, 150, 150, 150,
-	300, 300, 300, 300, 300, 300, 300, 300};
+uint32_t my_tune_times[]={ 375, 375, 375, 375, 375, 375, 375, 375,
+	750, 750, 750, 750, 750, 750, 750, 750};
 // global variables to play the tune
 uint32_t * background_tune_notes=0;
 uint32_t * background_tune_times;
