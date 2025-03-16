@@ -409,6 +409,8 @@ const uint16_t *UserChoosePokemon()
 	uint8_t menuThickness = 2;
 	// color of menu and text
 	uint16_t menuColor = RGBToWord(255,50,0);
+	// color of the prompt
+	uint16_t textColor = 0x0;
 	// prompt for user
 	char *prompt = "Choose pokemon!";
 	// serial message 
@@ -429,7 +431,7 @@ const uint16_t *UserChoosePokemon()
 	DrawMenuFrame(xPosition, yPosition, menuThickness, menuColor);
 
 	// write a prompt for user to chose a pokemon
-	printText(prompt, xPosition*2, ((SCREENHEIGHT-yPosition-xPosition-menuThickness)/2 + yPosition), menuColor, 0);
+	printText(prompt, xPosition*2, ((SCREENHEIGHT-yPosition-xPosition-menuThickness)/2 + yPosition), textColor, 0);
 
 	while(1)
 	{
