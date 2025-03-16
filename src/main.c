@@ -409,6 +409,8 @@ const uint16_t *UserChoosePokemon()
 	uint8_t menuThickness = 2;
 	// color of menu and text
 	uint16_t menuColor = RGBToWord(255,50,0);
+	// color of the prompt
+	uint16_t textColor = 0x0;
 	// prompt for user
 	char *prompt = "Choose pokemon!";
 	// serial message 
@@ -429,7 +431,7 @@ const uint16_t *UserChoosePokemon()
 	DrawMenuFrame(xPosition, yPosition, menuThickness, menuColor);
 
 	// write a prompt for user to chose a pokemon
-	printText(prompt, xPosition*2, ((SCREENHEIGHT-yPosition-xPosition-menuThickness)/2 + yPosition), menuColor, 0);
+	printText(prompt, xPosition*2, ((SCREENHEIGHT-yPosition-xPosition-menuThickness)/2 + yPosition), textColor, 0);
 
 	while(1)
 	{
@@ -546,7 +548,6 @@ const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 	return 0;
 }
 
-
 // draw the menu frame, x and y position is top left corner of the menu
 void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t menuThickness, uint16_t menuColor)
 {
@@ -571,6 +572,12 @@ void initSysTick(void)
 	__asm(" cpsie i "); // enable interrupts
 
 }
+
+// // global variables to play the tune
+// uint32_t * background_tune_notes=0;			pointer to a note 
+// uint32_t * background_tune_times;			pointer to a duration of the note
+// uint32_t background_note_count;				count of all the notes
+// uint32_t background_tune_repeat;				true false, to repeat the tune
 void SysTick_Handler(void)
 {
 	static int index = 0;
