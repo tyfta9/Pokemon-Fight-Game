@@ -540,7 +540,6 @@ const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 	return 0;
 }
 
-
 // draw the menu frame, x and y position is top left corner of the menu
 void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t menuThickness, uint16_t menuColor)
 {
@@ -565,6 +564,12 @@ void initSysTick(void)
 	__asm(" cpsie i "); // enable interrupts
 
 }
+
+// // global variables to play the tune
+// uint32_t * background_tune_notes=0;			pointer to a note 
+// uint32_t * background_tune_times;			pointer to a duration of the note
+// uint32_t background_note_count;				count of all the notes
+// uint32_t background_tune_repeat;				true false, to repeat the tune
 void SysTick_Handler(void)
 {
 	static int index = 0;
