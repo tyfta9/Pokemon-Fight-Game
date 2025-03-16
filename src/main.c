@@ -80,13 +80,21 @@ void DisplayIntro(void);
 
 // let player choose a pokemon to play
 // should return pointer to the sprite player has chosen
-const uint16_t *UserChoosePokemon();
+const uint16_t *UserChoosePokemon(void);
 // random choice of cpu pokemon, except specified sprite
 const uint16_t *CpuChoosePokemon(const uint16_t *userSprite);
 // draw the menu frame, top line and bottom line
 void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t menuThickness, uint16_t menuColor);
 // get random number from zero to specified max value
 uint32_t GetRandom(uint32_t max);
+// send log report
+void MessageLog(char *message);
+// end the game 
+void EndGame(void);
+// print win message
+void PrintWin(void);
+// print lost message
+void PrintLost(void);
 
 volatile uint32_t milliseconds;
 
@@ -176,7 +184,7 @@ uint32_t shift_register=0;
 
 
 
-int main()
+int main(void)
 {
 	int hinverted = 0;
 	int vinverted = 0;
@@ -185,8 +193,6 @@ int main()
 	int vmoved = 0;
 	uint16_t x = 50;
 	uint16_t y = 50;
-	uint16_t oldx = x;
-	uint16_t oldy = y;
 	uint8_t playerX = 15;
 	uint8_t playerY = 70;
 	uint8_t cpuX = SCREENWIDTH-SPRITESIZE-playerX; // mirrored 
@@ -246,18 +252,146 @@ int main()
 		putImage(cpuX, cpuY, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);
 		DrawMenuFrame(spacing, playerY+SPRITESIZE+spacing, menuThickness, RGBToWord(255,50,0));
 
-		
-		
 		game_loop();//runs the game until end condition is met
-		
+		EndGame();		
 	}
 	return 0;
+}
+
+void EndGame(void)
+{
+	// waits for button to be released
+	while ((GPIOA->IDR & (1 << 8)) == 0 || 
+	(GPIOA->IDR & (1 << 11)) == 0 || 
+	(GPIOB->IDR & (1 << 5)) == 0 || 
+	(GPIOB->IDR & (1 << 4)) == 0)
+	{
+		delay(20);
+	}
+
+	// if user's sprite is pikachu
+	if(userSprite == pikachu)
+	{
+		// if user won
+		if(pikachu_health > 0)
+		{
+			PrintWin();
+		}
+		// if user lost
+		else
+		{
+			PrintLost();
+		}
+	}
+	// if user's sprite is charmander
+	else
+	{
+		// if user won
+		if(charmander_health > 0)
+		{
+			PrintWin();
+		}
+		// if user lost
+		else
+		{
+			PrintLost();
+		}
+	}
+}
+
+void PrintWin(void)
+{
+	char *message[8] = {{"YOU WON!"}, {"CONGRATS"}, {"YOU DID"}, {"SOMETHING"}, {"HARDER"}, {"THEN"}, {"MAKING"}, {"YOUR BED"}};
+	uint8_t messageLen = 8;
+	//uint16_t delayTime = 4;
+	uint16_t color = 0;
+
+	// clean the screen
+	fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0X0);
+
+	// change the color and print text util any button is pressed
+	while(1)
+	{
+		// prints each message
+		for(int i = 0; i < messageLen; i++)
+		{
+			printTextX2(message[i], 0, 20*i, color, 0x0);
+		}
+
+		// increment the color
+		color++;
+
+		// check if any button is pressed
+		if ((GPIOA->IDR & (1 << 8)) == 0 ||  // PA8		UP
+		(GPIOA->IDR & (1 << 11)) == 0 || // PA11	DOWN
+		(GPIOB->IDR & (1 << 5)) == 0 ||  // PB5		LEFT
+		(GPIOB->IDR & (1 << 4)) == 0)    // PB4		RIGHT
+		{
+			break;
+		}
+	}
+
+	// waits for button to be released
+	while ((GPIOA->IDR & (1 << 8)) == 0 || 
+	(GPIOA->IDR & (1 << 11)) == 0 || 
+	(GPIOB->IDR & (1 << 5)) == 0 || 
+	(GPIOB->IDR & (1 << 4)) == 0)
+	{
+		delay(20);
+	}
+
+	// clean the screen
+	fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0X0);
+}
+
+void PrintLost(void)
+{
+	char *message[8] = {{"HOW COULD"}, {"YOU LOSE"}, {"IT'S SUCH"}, {"A SHAME"}, {"YOU FAILED"}, {"UR TRAINER"}, {"AND YOUR"}, {"BLOOD LINE"}};
+	uint8_t messageLen = 8;
+	uint16_t color = 0;
+
+	// clean the screen
+	fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0X0);
+
+	// change the color and print text util any button is pressed
+	while(1)
+	{
+		// print each message
+		for(int i = 0; i < messageLen; i++)
+		{
+			printTextX2(message[i], 0, 20*i, color, 0x0);
+		}
+
+		// increment the color
+		color++;
+
+		// check if any button is pressed
+		if ((GPIOA->IDR & (1 << 8)) == 0 ||  // PA8		UP
+		(GPIOA->IDR & (1 << 11)) == 0 || // PA11	DOWN
+		(GPIOB->IDR & (1 << 5)) == 0 ||  // PB5		LEFT
+		(GPIOB->IDR & (1 << 4)) == 0)    // PB4		RIGHT
+		{
+			break;
+		}
+	}
+
+	// waits for button to be released
+	while ((GPIOA->IDR & (1 << 8)) == 0 || 
+	(GPIOA->IDR & (1 << 11)) == 0 || 
+	(GPIOB->IDR & (1 << 5)) == 0 || 
+	(GPIOB->IDR & (1 << 4)) == 0)
+	{
+		delay(20);
+	}
+
+	// clean the screen
+	fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0X0);
 }
 
 //funtion for running gameplay
 void game_loop()
 {
-	while(1)
+	while(pikachu_health && charmander_health)
 	{
 		print_pokemon_status_bar();// draws the status bars for each pokemon
 
@@ -427,7 +561,7 @@ const uint16_t *UserChoosePokemon()
 	// color of menu and text
 	uint16_t menuColor = RGBToWord(255,50,0);
 	// color of the prompt
-	uint16_t textColor = 0x0;
+	uint16_t textColor = 0xffff;
 	// prompt for user
 	char *prompt = "Choose pokemon!";
 	// serial message 
@@ -451,7 +585,7 @@ const uint16_t *UserChoosePokemon()
 	printText(prompt, xPosition*2, ((SCREENHEIGHT-yPosition-xPosition-menuThickness)/2 + yPosition), textColor, 0);
 
 	while(1)
-	{
+	{	
 		// if left button is pressed
 		if((GPIOB->IDR & (1 << 5)) == 0)
 		{
@@ -472,6 +606,9 @@ const uint16_t *UserChoosePokemon()
 			
 			// send serial massage, report players choice
 			MessageLog(strcat(serialMessage, "Pikachu!"));
+
+			// turn on yellow LED
+			GPIOB->ODR |= (1 << 3);
 
 			// return pointer that points at chosen sprite
 			return pikachu;
@@ -497,6 +634,9 @@ const uint16_t *UserChoosePokemon()
 			
 			// send serial massage, report players choice
 			MessageLog(strcat(serialMessage, "Charmander!"));
+
+			// turn on red LED
+			GPIOA->ODR |= (1 << 0);
 
 			// return pointer that points at chosen sprite
 			return charmander;
@@ -695,13 +835,15 @@ void setupIO()
 	RCC->AHBENR |= (1 << 18) + (1 << 17); // enable Ports A and B
 	display_begin();
 	pinMode(GPIOB,3,1); // yellow LED
-	pinMode(GPIOB,4,0);
-	pinMode(GPIOB,5,0);
-	pinMode(GPIOA,8,0);
-	pinMode(GPIOA,11,0);
+	pinMode(GPIOB,4,0); // RIGHT button
+	pinMode(GPIOB,5,0); // LEFT button
+	pinMode(GPIOA,1,0); // RESET button
+	pinMode(GPIOA,8,0); // UP button
+	pinMode(GPIOA,11,0);// DOWN button
 	pinMode(GPIOA,0,1); // red LED
 	enablePullUp(GPIOB,4);
 	enablePullUp(GPIOB,5);
+	enablePullUP(GPIOA,1);
 	enablePullUp(GPIOA,11);
 	enablePullUp(GPIOA,8);
 }
@@ -711,6 +853,12 @@ void select_pika()//selects pokemon move
 {
 	uint16_t color = RGBToWord(255,50,0);
 	int choice = move_down_func();//storing the users move choice
+
+	// turns red LED off
+	GPIOA->ODR &= ~(1 << 0);
+
+	// turn on yellow LED
+	GPIOB->ODR |= (1 << 3);
 
 	if(((GPIOB->IDR & (1 << 4)) == 0) )//checks if right button presssed
 	{
@@ -786,6 +934,9 @@ void select_pika()//selects pokemon move
 		default:
 			break;
 		}
+
+		// turns yellow LED off
+		GPIOB->ODR &= ~(1 << 3);
 	}
 }
 
@@ -854,6 +1005,12 @@ void select_charmder()//func to select moves when user plays as charmander
 {
 	uint16_t color = RGBToWord(255,50,0);
 	int choice = move_down_func();//storing the users choice
+
+	// turns yellow LED off
+	GPIOB->ODR &= ~(1 << 3);
+
+	// turn on red LED
+	GPIOA->ODR |= (1 << 0);
 
 	if(((GPIOB->IDR & (1 << 4)) == 0) )
 	{
@@ -928,9 +1085,13 @@ void select_charmder()//func to select moves when user plays as charmander
 			break;
 			
 		
-		default:
+			default:
 			break;
 		}
+
+		// turns red LED off
+		GPIOA->ODR &= ~(1 << 0);
+
 	}
 		
 
@@ -975,6 +1136,12 @@ void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 		char *prompt3 = "Char used Heal!";
 		int width = 125;
 		int height =40;
+
+		// turns yellow LED off
+		GPIOB->ODR &= ~(1 << 3);
+
+		// turn on red LED
+		GPIOA->ODR |= (1 << 0);
 
 		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow draw by move down func
 
@@ -1034,6 +1201,9 @@ void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 			return -1;//error
 			break;
 		}
+
+		// turns red LED off
+		GPIOA->ODR &= ~(1 << 0);
 	}
 }
 
@@ -1054,6 +1224,12 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 		char *prompt3 = "Pika used Heal!";
 		int width = 125;
 		int height = 40;
+
+		// turns red LED off
+		GPIOA->ODR &= ~(1 << 0);
+
+		// turn on yellow LED
+		GPIOB->ODR |= (1 << 3);
 
 		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow draw by move down func
 
@@ -1116,6 +1292,9 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 			
 			break;
 		}
+
+		// turns yellow LED off
+		GPIOB->ODR &= ~(1 << 3);
 	}
 }
 
