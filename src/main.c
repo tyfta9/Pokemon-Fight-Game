@@ -75,13 +75,21 @@ void DisplayIntro(void);
 
 // let player choose a pokemon to play
 // should return pointer to the sprite player has chosen
-const uint16_t *UserChoosePokemon();
+const uint16_t *UserChoosePokemon(void);
 // random choice of cpu pokemon, except specified sprite
 const uint16_t *CpuChoosePokemon(const uint16_t *userSprite);
 // draw the menu frame, top line and bottom line
 void DrawMenuFrame(uint8_t xPosition, uint8_t yPosition, uint8_t menuThickness, uint16_t menuColor);
 // get random number from zero to specified max value
 uint32_t GetRandom(uint32_t max);
+// send log report
+void MessageLog(char *message);
+// end the game 
+void EndGame(void);
+// print win message
+void PrintWin(void);
+// print lost message
+void PrintLost(void);
 
 volatile uint32_t milliseconds;
 
@@ -164,7 +172,7 @@ uint32_t shift_register=0;
 
 
 
-int main()
+int main(void)
 {
 	int hinverted = 0;
 	int vinverted = 0;
@@ -173,8 +181,6 @@ int main()
 	int vmoved = 0;
 	uint16_t x = 50;
 	uint16_t y = 50;
-	uint16_t oldx = x;
-	uint16_t oldy = y;
 	uint8_t playerX = 15;
 	uint8_t playerY = 70;
 	uint8_t cpuX = SCREENWIDTH-SPRITESIZE-playerX; // mirrored 
@@ -229,18 +235,146 @@ int main()
 		putImage(cpuX, cpuY, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);
 		DrawMenuFrame(spacing, playerY+SPRITESIZE+spacing, menuThickness, RGBToWord(255,50,0));
 
-		
-		
 		game_loop();//runs the game until end condition is met
-		
+		EndGame();		
 	}
 	return 0;
+}
+
+void EndGame(void)
+{
+	// waits for button to be released
+	while ((GPIOA->IDR & (1 << 8)) == 0 || 
+	(GPIOA->IDR & (1 << 11)) == 0 || 
+	(GPIOB->IDR & (1 << 5)) == 0 || 
+	(GPIOB->IDR & (1 << 4)) == 0)
+	{
+		delay(20);
+	}
+
+	// if user's sprite is pikachu
+	if(userSprite == pikachu)
+	{
+		// if user won
+		if(pikachu_health > 0)
+		{
+			PrintWin();
+		}
+		// if user lost
+		else
+		{
+			PrintLost();
+		}
+	}
+	// if user's sprite is charmander
+	else
+	{
+		// if user won
+		if(charmander_health > 0)
+		{
+			PrintWin();
+		}
+		// if user lost
+		else
+		{
+			PrintLost();
+		}
+	}
+}
+
+void PrintWin(void)
+{
+	char *message[8] = {{"YOU WON!"}, {"CONGRATS"}, {"YOU DID"}, {"SOMETHING"}, {"HARDER"}, {"THEN"}, {"MAKING"}, {"YOUR BED"}};
+	uint8_t messageLen = 8;
+	//uint16_t delayTime = 4;
+	uint16_t color = 0;
+
+	// clean the screen
+	fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0X0);
+
+	// change the color and print text util any button is pressed
+	while(1)
+	{
+		// prints each message
+		for(int i = 0; i < messageLen; i++)
+		{
+			printTextX2(message[i], 0, 20*i, color, 0x0);
+		}
+
+		// increment the color
+		color++;
+
+		// check if any button is pressed
+		if ((GPIOA->IDR & (1 << 8)) == 0 ||  // PA8		UP
+		(GPIOA->IDR & (1 << 11)) == 0 || // PA11	DOWN
+		(GPIOB->IDR & (1 << 5)) == 0 ||  // PB5		LEFT
+		(GPIOB->IDR & (1 << 4)) == 0)    // PB4		RIGHT
+		{
+			break;
+		}
+	}
+
+	// waits for button to be released
+	while ((GPIOA->IDR & (1 << 8)) == 0 || 
+	(GPIOA->IDR & (1 << 11)) == 0 || 
+	(GPIOB->IDR & (1 << 5)) == 0 || 
+	(GPIOB->IDR & (1 << 4)) == 0)
+	{
+		delay(20);
+	}
+
+	// clean the screen
+	fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0X0);
+}
+
+void PrintLost(void)
+{
+	char *message[8] = {{"HOW COULD"}, {"YOU LOSE"}, {"IT'S SUCH"}, {"A SHAME"}, {"YOU FAILED"}, {"UR TRAINER"}, {"AND YOUR"}, {"BLOOD LINE"}};
+	uint8_t messageLen = 8;
+	uint16_t color = 0;
+
+	// clean the screen
+	fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0X0);
+
+	// change the color and print text util any button is pressed
+	while(1)
+	{
+		// print each message
+		for(int i = 0; i < messageLen; i++)
+		{
+			printTextX2(message[i], 0, 20*i, color, 0x0);
+		}
+
+		// increment the color
+		color++;
+
+		// check if any button is pressed
+		if ((GPIOA->IDR & (1 << 8)) == 0 ||  // PA8		UP
+		(GPIOA->IDR & (1 << 11)) == 0 || // PA11	DOWN
+		(GPIOB->IDR & (1 << 5)) == 0 ||  // PB5		LEFT
+		(GPIOB->IDR & (1 << 4)) == 0)    // PB4		RIGHT
+		{
+			break;
+		}
+	}
+
+	// waits for button to be released
+	while ((GPIOA->IDR & (1 << 8)) == 0 || 
+	(GPIOA->IDR & (1 << 11)) == 0 || 
+	(GPIOB->IDR & (1 << 5)) == 0 || 
+	(GPIOB->IDR & (1 << 4)) == 0)
+	{
+		delay(20);
+	}
+
+	// clean the screen
+	fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, 0X0);
 }
 
 //funtion for running gameplay
 void game_loop()
 {
-	while(1)
+	while(pikachu_health && charmander_health)
 	{
 		print_pokemon_status_bar();// draws the status bars for each pokemon
 
@@ -410,7 +544,7 @@ const uint16_t *UserChoosePokemon()
 	// color of menu and text
 	uint16_t menuColor = RGBToWord(255,50,0);
 	// color of the prompt
-	uint16_t textColor = 0x0;
+	uint16_t textColor = 0xffff;
 	// prompt for user
 	char *prompt = "Choose pokemon!";
 	// serial message 
@@ -434,7 +568,7 @@ const uint16_t *UserChoosePokemon()
 	printText(prompt, xPosition*2, ((SCREENHEIGHT-yPosition-xPosition-menuThickness)/2 + yPosition), textColor, 0);
 
 	while(1)
-	{
+	{	
 		// if left button is pressed
 		if((GPIOB->IDR & (1 << 5)) == 0)
 		{
