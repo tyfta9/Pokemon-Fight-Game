@@ -290,7 +290,7 @@ void randomize(void)
     // uses ADC noise values to seed the shift_register
     while(shift_register==0)
     {
-        for (int i=0;i<10;i++)
+        for (int i= 0;i < 10;i++)
         {
             shift_register+=(readADC()<<i);
         }
@@ -733,7 +733,7 @@ void select_pika()//selects pokemon move
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
 
 			printText(prompt3, 4, 126, color, 0);
-			//call heal-not yet done
+			heal(1);
 			MessageLog(prompt3); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
@@ -867,7 +867,7 @@ void select_charmder()//func to select moves when user plays as charmander
 			case 3:
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
 			printText(prompt3, 4, 126, color, 0);
-			//call heal func - not yet done
+			heal(1);
 			MessageLog(prompt3); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
@@ -963,7 +963,7 @@ void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 		case 3:
 
 			fillRectangle(X, 115, width, height, 0x0);//eraases moves
-			//call heal func
+			heal(2);
 			printText(prompt3, 4, 126, color, 0);
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
@@ -997,7 +997,7 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 		char *prompt2  = "Pika used Thunder!";
 		char *prompt3 = "Pika used Heal!";
 		int width = 125;
-		int height =40;
+		int height = 40;
 
 		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow draw by move down func
 
@@ -1040,6 +1040,8 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 
 			printText(prompt3, 4, 126, color, 0);
 
+			heal(2);
+
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
 				//wait
@@ -1060,8 +1062,13 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 
 void pika_health_animation()//func handaling pikachus health bar animations
 {
+	if (pikachu_health <= 0)//stops hp bar overflow
+	{
+		pikachu_health = 0;
+	}
+	
 
-	int width = (45*pikachu_health)/80;//sets bar widh based on pikachu's current health
+	int width = (45*pikachu_health)/80;//sets hp bar widh based on pikachu's current health
 	uint16_t color_health_bar = RGBToWord(0,255,0);
 
 	fillRectangle(80,81.5,45,3.5,0x0);//erases previous hp bar
@@ -1146,30 +1153,61 @@ void thunder(int attaker)//thunder attack func takes in who is attaking as a par
 				pika_health_animation();
 			
 			}
-			
-			
-			
+
 
 		default:
 			break;
 	}
 }
 
-void heal(int attaker)//funfion to heal pokemon-not yet done
+void heal(int attaker)//func to heal pokemon-not yet done
 
 {
-	charmander_health = charmander_health + 10;
+	
+	switch (attaker)
+	{
+		case 1: //user attacking pokemon
 
+			if (charmander_health <= 0)//prevents healh bar overflow
+			{
+				break;
+
+			}
+			else
+			{
+				charmander_health = charmander_health + 10;
+
+				char_health_animation();
+			}
+			break;
+
+		case 2: //cpu attacking user
+			if (pikachu_health <= 0)
+			{
+				break;
+			}
+			else
+			{
+				pikachu_health = pikachu_health + 10;
+				pika_health_animation();
+			}
+			break;
+			
+			
+
+		default:
+			break;
+	}
 
 }
 
-void ember(int attaker)
+void ember(int attaker)//ember attack func takes in who is attaking as a parameter 1 = user attack 2 = cpu attack
 {
 	switch (attaker)
 	{
-		case 1: //pikachu attaking charmander
+		case 1: //user attacking pokemon
 
-			if (charmander_health <= 0)
+			if (charmander_health <= 0)//prevents healh bar overflow
 			{
 				break;
 
@@ -1177,14 +1215,12 @@ void ember(int attaker)
 			else
 			{
 				charmander_health = charmander_health - 15;
+
 				char_health_animation();
 			}
-			
-			
-			
 			break;
 
-		case 2: //cpu(pikachu) attacking charmander
+		case 2: //cpu attacking user
 			if (pikachu_health <= 0)
 			{
 				break;
@@ -1194,7 +1230,7 @@ void ember(int attaker)
 				pikachu_health = pikachu_health - 15;
 				pika_health_animation();
 			}
-			
+			break;
 			
 			
 
@@ -1208,13 +1244,15 @@ void ember(int attaker)
 
 void char_health_animation()//handales charmanders health animation
 {
-	int width = (45*charmander_health)/80;
-	// uint16_t color = RGBToWord(255,50,0);
+	if(charmander_health <= 0)//stops hp bar overflow
+	{
+		charmander_health = 0;
+	}
+	int width = (45*charmander_health)/80;//sets hp bar widh based on charmander's current health
 	uint16_t color_health_bar = RGBToWord(0,255,0);
 
-	
-
 	fillRectangle(22,31.5,45,3.5,0x0);//erases previous hp bar
+
 	fillRectangle(22,31.5,width,3.5,color_health_bar);//draws new hp bar
 
 }
@@ -1222,7 +1260,7 @@ void char_health_animation()//handales charmanders health animation
 
 
 
-void print_pokemon_status_bar()//outputs graphics foe pokemon health bar
+void print_pokemon_status_bar()//outputs status bars for each pokemon
 {
 	uint16_t color_poke_name = RGBToWord(160,30,0);
 	uint16_t color_health_bar = RGBToWord(0,255,0);
@@ -1230,30 +1268,36 @@ void print_pokemon_status_bar()//outputs graphics foe pokemon health bar
 	char *pokemon_name_pika = "Pikachu";
 	char *pokemon_name_char = "Charmander";
 	char *hp = "HP:";
-	int width = (45*charmander_health)/80;
-	int witdh_pika = (45*pikachu_health)/80;
+	int width = (45*charmander_health)/80;//sets hp bar widh based on charmander's current health
+	int witdh_pika = (45*pikachu_health)/80;//sets hp bar widh based on pikachus's current health
+	int x_pika = 80;
+	int y_pika = 81;
+	int height_pika = 3;
+	int char_x = 22;
+	int char_y = 31;
+	
 
 	if(userSprite == pikachu)
 	{
+		//draw pikachu's staus
+		fillRectangle(x_pika,y_pika,witdh_pika,height_pika,color_health_bar);//draws health bar for pikachu
 
-		
-	
-
-		//draw pikacju's staus
-		
-		fillRectangle(80,81.5,witdh_pika,3.5,color_health_bar);//draws health bar for pikachu
 		fillRectangle(58,90,67,1.5,color);//draws line under h bar or pikachu
+
 		printText(pokemon_name_pika, 60,65,color_poke_name, 0);//prints out pokemon name or pikachu
+
 		printText(hp,60,79.5,color_poke_name, 0);//prints out hp label or pikachu
-		
 		//end
 
 
 	
 		//Draw charmader status
-		fillRectangle(22,31.5,width,3.5,color_health_bar);//draws health bar for charmander
-		fillRectangle(3,40,67,1.5,color);//draws line under h bar or charmander
+		fillRectangle(char_x,char_y,width,height_pika,color_health_bar);//draws health bar for charmander
+
+		fillRectangle(3,40,67,1.5,color);//draws line under hp bar or charmander
+
 		printText(pokemon_name_char, 5,13,color_poke_name, 0);//prints out pokemon name or charmander
+
 		printText(hp,3,30,color_poke_name, 0);//prints out hp label or charmander
 		//end
 
@@ -1261,20 +1305,24 @@ void print_pokemon_status_bar()//outputs graphics foe pokemon health bar
 	else
 	{
 
-		
-
 		//Draw charmader status
-		fillRectangle(22,31.5,width,3.5,color_health_bar);//draws health bar for charmander
-		fillRectangle(3,40,67,1.5,color);//draws line under h bar or charmander
+		fillRectangle(char_x,char_y,width,height_pika,color_health_bar);//draws health bar for charmander
+
+		fillRectangle(3,40,67,1.5,color);//draws line under hp bar or charmander
+
 		printText(pokemon_name_pika, 5,13,color_poke_name, 0);//prints out pokemon name or charmander
+
 		printText(hp,3,30,color_poke_name, 0);//prints out hp label or charmander
 		//end
 
 
 		//draw pikachu's staus
-		fillRectangle(80,81.5,witdh_pika,3.5,color_health_bar);//draws health bar for pikachu
-		fillRectangle(58,90,67,1.5,color);//draws line under h bar or pikachu
+		fillRectangle(x_pika,y_pika,witdh_pika,height_pika,color_health_bar);//draws health bar for pikachu
+
+		fillRectangle(58,90,67,1.5,color);//draws line under hp bar or pikachu
+
 		printText(pokemon_name_char, 60,65,color_poke_name, 0);//prints out pokemon name or pikachu
+
 		printText(hp,60,79.5,color_poke_name, 0);//prints out hp label or pikachu
 		//end
 	}
