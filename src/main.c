@@ -684,13 +684,15 @@ void setupIO()
 	RCC->AHBENR |= (1 << 18) + (1 << 17); // enable Ports A and B
 	display_begin();
 	pinMode(GPIOB,3,1); // yellow LED
-	pinMode(GPIOB,4,0);
-	pinMode(GPIOB,5,0);
-	pinMode(GPIOA,8,0);
-	pinMode(GPIOA,11,0);
+	pinMode(GPIOB,4,0); // RIGHT button
+	pinMode(GPIOB,5,0); // LEFT button
+	pinMode(GPIOA,1,0); // RESET button
+	pinMode(GPIOA,8,0); // UP button
+	pinMode(GPIOA,11,0);// DOWN button
 	pinMode(GPIOA,0,1); // red LED
 	enablePullUp(GPIOB,4);
 	enablePullUp(GPIOB,5);
+	enablePullUP(GPIOA,1);
 	enablePullUp(GPIOA,11);
 	enablePullUp(GPIOA,8);
 }
