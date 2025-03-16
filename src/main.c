@@ -52,8 +52,8 @@ void pika_moves();
 void select_charmder();
 void charm_moves();
 void playTune(uint32_t [], uint32_t [], int);
-void cpu_choose_move_char();
-void cpu_choose_move_pika();
+int cpu_choose_move_char();
+int cpu_choose_move_pika();
 void pika_health_animation();
 void char_health_animation();
 void print_pokemon_status_bar();
@@ -164,6 +164,14 @@ const uint16_t dg1[]=
 {
 	0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,16142,16142,16142,0,0,0,0,16142,16142,16142,16142,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,16142,16142,16142,0,0,0,0,16142,16142,16142,1994,16142,1994,16142,16142,0,0,0,0,16142,16142,16142,1994,1994,1994,16142,16142,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,0,0,0,16142,16142,16142,16142,16142,16142,0,0,0,
 };
+
+
+const uint16_t healFx[] = 
+{
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9293,9293,9293,0,0,0,0,0,0,0,0,0,0,0,0,0,9293,9293,9293,0,0,0,0,0,0,0,0,0,0,0,0,0,9293,9293,9293,0,0,0,0,0,0,0,0,0,0,9293,9293,9293,9293,9293,9293,9293,9293,9293,0,0,0,0,0,0,0,9293,9293,9293,9293,9293,9293,9293,9293,9293,0,0,0,0,0,0,0,9293,9293,9293,9293,9293,9293,9293,9293,9293,0,0,0,0,0,0,0,0,0,0,9293,9293,9293,0,0,0,0,0,0,0,0,0,0,0,0,0,9293,9293,9293,0,0,0,0,0,0,0,0,0,0,0,0,0,9293,9293,9293,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+};
+
+
 
 int pikachu_health = 80;
 int charmander_health = 80;
@@ -1065,7 +1073,7 @@ void playBackgroundTune(uint32_t * notes, uint32_t * times, uint32_t count, uint
 	background_tune_repeat=repeat;
 }
 
-void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
+int cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 {
 	int move_choice = 0;
 	uint16_t color = RGBToWord(255,50,0);
@@ -1090,6 +1098,12 @@ void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 		GPIOA->ODR |= (1 << 0);
 
 		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow draw by move down func
+
+		if (charmander_health == 0)
+		{
+			return 1;
+		}
+		
 
 		switch (move_choice)
 		{
@@ -1153,7 +1167,7 @@ void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 	}
 }
 
-void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
+int cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 {
 
 	int move_choice = 0;
@@ -1178,6 +1192,12 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 		GPIOB->ODR |= (1 << 3);
 
 		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow draw by move down func
+
+		if (pikachu_health || charmander_health == 0)
+		{
+			return 1;
+		}
+		
 
 		switch (move_choice)
 		{
