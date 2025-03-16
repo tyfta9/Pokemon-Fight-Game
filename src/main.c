@@ -70,6 +70,9 @@ void DisplayStartScreen(void);
 // play tune in the background
 void playBackgroundTune(uint32_t *, uint32_t *, uint32_t, uint32_t);
 
+// displays the intro/novel
+void DisplayIntro(void);
+
 // let player choose a pokemon to play
 // should return pointer to the sprite player has chosen
 const uint16_t *UserChoosePokemon();
@@ -85,8 +88,8 @@ volatile uint32_t milliseconds;
 //
 uint32_t my_tune_notes[]={ AS4_Bb4, F4, DS4_Eb4, F4, AS4_Bb4, F4, DS4_Eb4, F4, 
 						AS4_Bb4, DS5_Eb5, CS5_Db5, AS4_Bb4, GS4_Ab4, F4, DS4_Eb4, C4};
-uint32_t my_tune_times[]={ 150, 150, 150, 150, 150, 150, 150, 150,
-	300, 300, 300, 300, 300, 300, 300, 300};
+uint32_t my_tune_times[]={ 375, 375, 375, 375, 375, 375, 375, 375,
+	750, 750, 750, 750, 750, 750, 750, 750};
 // global variables to play the tune
 uint32_t * background_tune_notes=0;
 uint32_t * background_tune_times;
@@ -207,10 +210,13 @@ int main()
 	while(1)
 	{
 		// plays the tune
-		playBackgroundTune(my_tune_notes,my_tune_times,3,1);
+		// playBackgroundTune(my_tune_notes,my_tune_times,3,1);
 
 		// displays the start screen for the user
 		DisplayStartScreen();
+
+		// displays the intro/novel
+		DisplayIntro();
 
 		// keep coding using those values as if
 		// userSprite is a pointer to the sprite chosen by the player
@@ -1288,9 +1294,99 @@ void print_pokemon_status_bar()//outputs graphics foe pokemon health bar
 	
 }
 
+void DisplayIntro()
+{
+    // novel speech
+    const char *script[] = {
+        "Hello, I'm Dr. Frank, welcome to the world of Processormon.",
+        "Today you will get to choose your   very own battle partner.",
+        "After that you    will be able to   have your first   battle.",
+        "Best of Luck!"
+    };
 
+	// defines lines that will be needed
+    uint16_t numLines = sizeof(script) / sizeof(script[0]);
+    
+	// x positioning for out text
+	uint16_t textX = 5;
+    uint16_t textYStart = 10;
+    uint16_t lineSpacing = 18;
+    
+	// positioning for our character
+	uint16_t charX = 40;
+    uint16_t charY = 90;
+    uint16_t charWidth = 49;
+    uint16_t charHeight = 49;
+    
+	// background and text color
+	uint16_t backgroundColor = RGBToWord(0, 0, 0);
+    uint16_t textColor = RGBToWord(255, 255, 255);
+    
+	// buffer to text splitting
+	char tempBuffer[50];
 
+    uint16_t currentLine = 0;
 
+    // Clear screen and display character sprite
+    fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, backgroundColor);
+    putImage(charX, charY, charWidth, charHeight, character, 0, 0);
 
+    while (currentLine < numLines)
+    {
+        // Clear the text area
+        fillRectangle(0, 0, SCREENWIDTH, charY, backgroundColor);
 
+        const char *text = script[currentLine];
+        uint16_t yOffset = textYStart;
 
+        // Split and display long text into smaller chunks
+        while (*text)
+        {
+            uint16_t charCount = 0;
+            uint16_t textWidth = 0;
+
+            // Calculate how many characters fit within the screen width
+            while (text[charCount] != '\0' && textWidth < SCREENWIDTH - textX)
+            {
+                textWidth += 6; // Assume 6 pixels width per character
+                if (textWidth >= SCREENWIDTH - textX) break;
+                charCount++;
+            }
+
+            // Handle word break and avoid cutting mid-word
+            while (charCount > 0 && text[charCount] != ' ' && text[charCount] != '\0')
+            {
+                charCount--;
+            }
+
+            // Copy the characters to the buffer
+            strncpy(tempBuffer, text, charCount);
+            tempBuffer[charCount] = '\0';
+
+            // Print the line and adjust Y position
+            printText(tempBuffer, textX, yOffset, textColor, backgroundColor);
+            yOffset += lineSpacing;
+
+            // Move the pointer to the next part of the text
+            text += (charCount + (text[charCount] == ' ' ? 1 : 0));
+        }
+
+        // Wait for right arrow button (PB4) press
+        while ((GPIOB->IDR & (1 << 4)) != 0)
+        {
+            delay(20); // Small delay to prevent CPU overload
+        }
+
+        // Wait until the button is released
+        while ((GPIOB->IDR & (1 << 4)) == 0)
+        {
+            delay(20);
+        }
+
+        // Move to the next line in the script
+        currentLine++;
+    }
+
+    // Transition to Pokémon selection screen
+    fillRectangle(0, 0, SCREENWIDTH, SCREENHEIGHT, backgroundColor); // Clear screen
+}
