@@ -194,14 +194,6 @@ int main(void)
 	uint8_t cpuY = playerX;
 	uint8_t spacing = 5; // space between users sprite and menu
 	uint8_t menuThickness = 2;
-
-	// When changing the notes, check for the duration of each note (in milliseconds)
-	uint32_t pokemon_battle_theme[] = { AS4_Bb4, F4, DS4_Eb4, F4, AS4_Bb4, F4, DS4_Eb4, F4, 
-		AS4_Bb4, DS5_Eb5, CS5_Db5, AS4_Bb4, GS4_Ab4, F4, DS4_Eb4, C4};
-	uint32_t theme_durations[] = { 150, 150, 150, 150, 150, 150, 150, 150,
-		300, 300, 300, 300, 300, 300, 300, 300};
-	
-
 	
 	uint16_t color = RGBToWord(255,50,0);
 
@@ -217,11 +209,10 @@ int main(void)
 	initSound();
 	randomize();
 
-	// plays the tune
-	// commented out until we figure out how to play it in the background while the code runs
-	// playTune(pokemon_battle_theme, theme_durations, 16);
 	while(1)
 	{
+		pikachu_health = 80;
+		charmander_health = 80;
 		// plays the tune
 		// playBackgroundTune(my_tune_notes,my_tune_times,3,1);
 
