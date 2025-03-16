@@ -225,6 +225,8 @@ int main()
 		// displays the intro/novel
 		DisplayIntro();
 
+		
+
 		// keep coding using those values as if
 		// userSprite is a pointer to the sprite chosen by the player
 		userSprite = UserChoosePokemon();
@@ -232,6 +234,8 @@ int main()
 		cpuSprite = CpuChoosePokemon(userSprite);
 		
 		// Drawing pokemon
+		
+
 		
 		putImage(playerX, playerY, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);
 		putImage(cpuX, cpuY, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);
@@ -724,6 +728,8 @@ void select_pika()//selects pokemon move
 
 			scratch(1);//call scratch func to dammage opponent(1-damages cpu's pokemon)
 
+			putImage(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,scratchVFX,0,0);//draw scratch sprite
+
 			MessageLog(prompt1); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
@@ -731,6 +737,7 @@ void select_pika()//selects pokemon move
 				//wait
 			}
 
+			fillRectangle(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,0x0);//erase scratch sprite
 			fillRectangle(4, 115, width, height, 0x0);//erases promt
 
 			break;
@@ -742,6 +749,7 @@ void select_pika()//selects pokemon move
 			printText(prompt2, 4, 126, color, 0);
 
 			thunder(1);//call thunder func to dammage opponent(1-damages cpu's pokemon)
+			putImage(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,lightningVFX,0,0);//draw thunder sprite
 
 			MessageLog(prompt2); // serial log
 
@@ -749,6 +757,8 @@ void select_pika()//selects pokemon move
 			{
 				//wait
 			}
+
+			fillRectangle(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,0x0);//erase thunder  sprite
 			fillRectangle(4, 115, width, height, 0x0);//erases promt
 			break;
 		
@@ -861,12 +871,16 @@ void select_charmder()//func to select moves when user plays as charmander
 
 			scratch(1);//call scratch func to dammage opponent(1-damages cpu's pokemon)
 
+			putImage(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,scratchVFX,0,0);//draw scratch sprite
+
 			MessageLog(prompt1); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
 				//wait
 			}
+
+		    fillRectangle(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,0x0);//draw scratch sprite
 			fillRectangle(4, 115, width, height, 0x0);//erases promt
 			break;
 
@@ -877,7 +891,8 @@ void select_charmder()//func to select moves when user plays as charmander
 			printText(prompt2, 4, 126, color, 0);
 
 			ember(1);//call ember func to dammage opponent(1-damages cpu's pokemon)
-			putImage(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,fireballVFX,0,0);
+
+			putImage(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,fireballVFX,0,0);//draw fireball sprite
 
 			MessageLog(prompt2); // serial log
 
@@ -888,7 +903,8 @@ void select_charmder()//func to select moves when user plays as charmander
 
 			}
 
-			fillRectangle(73,45,16,16,0x0);
+			fillRectangle(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,0x0);//erase fireball sprite
+
 			fillRectangle(4, 115, width, height, 0x0);//erases promt
 			break;
 
@@ -966,26 +982,31 @@ void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 			printText(promt1, 4, 126, color, 0);
 
 			scratch(2);//call scratch func to dammage opponent(2-damages user pokemon)
+			putImage(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,scratchVFX,0,0);//draw scratch sprite
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
 				//wait
 			}
+
+			fillRectangle(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,0x0);//erase scratch sprite
 			fillRectangle(4, 115, width, height, 0x0);//erases promt
 			break;
 
 		case 2:
 
-			fillRectangle(X, 115, width, height, 0x0);//eraases moves
+			fillRectangle(X, 115, width, height, 0x0);//erases moves
 
 			printText(prompt2, 4, 126, color, 0);
 
 			ember(2);//call ember func to dammage opponent(2-damages user's pokemon)
+			putImage(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,fireballVFX,0,0);//draw scratch sprite
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
 				//wait
 			}
+			fillRectangle(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,0x0);//draw scratch sprite
 			fillRectangle(4, 115, width, height, 0x0);//erases promt
 			break;
 
@@ -1040,11 +1061,14 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 			printText(promt1, 4, 126, color, 0);
 
 			scratch(2);//call scratch func to dammage opponent(2-damages user's pokemon)
+			putImage(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,scratchVFX,0,0);//draw scratch sprite
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
 				//wait
 			}
+
+			fillRectangle(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,0x0);//draw scratch sprite
 			fillRectangle(4, 115, width, height, 0x0);//erases promt
 			break;
 
@@ -1055,11 +1079,14 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 			printText(prompt2, 4, 126, color, 0);
 
 			thunder(2);//call thunder func to dammage opponent(2-damages user's pokemon)
+			putImage(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,lightningVFX,0,0);//draw thunder sprite
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
 				//wait
 			}
+
+			fillRectangle(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,0x0);//erase tunder sprite
 			fillRectangle(4, 115, width, height, 0x0);//erases promt
 			break;
 
@@ -1081,7 +1108,7 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 			
 		
 		default:
-			return -1;
+			
 			break;
 		}
 	}
