@@ -622,7 +622,7 @@ const uint16_t *CpuChoosePokemon(const uint16_t *userSprite)
 	while(1)
 	{
 		// choose 1 or 0
-		choice = rand() % SPRITECOUNT;
+		choice = GetRandom(SPRITECOUNT);
 
 		switch (choice)
 		{
@@ -1071,7 +1071,7 @@ void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 	uint16_t color = RGBToWord(255,50,0);
 
 
-	move_choice = (rand() % CPU_MOVE_CHOICE) + 1;//getting random number between 1=3
+	move_choice = (GetRandom(CPU_MOVE_CHOICE)) + 1;//getting random number between 1=3
 
 
 	if(((GPIOB->IDR & (1 << 4)) == 0) )//check if right button pressed
@@ -1160,7 +1160,7 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 	uint16_t color = RGBToWord(255,50,0);
 
 
-	move_choice = (rand() % CPU_MOVE_CHOICE) + 1;//getting random number between 1=3
+	move_choice = (GetRandom(CPU_MOVE_CHOICE)) + 1;//getting random number between 1=3
 
 	if(((GPIOB->IDR & (1 << 4)) == 0) )//check if right button pressed
 	{
