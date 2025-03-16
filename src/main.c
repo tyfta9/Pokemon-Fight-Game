@@ -456,6 +456,9 @@ const uint16_t *UserChoosePokemon()
 			// send serial massage, report players choice
 			MessageLog(strcat(serialMessage, "Pikachu!"));
 
+			// turn on yellow LED
+			GPIOB->ODR |= (1 << 3);
+
 			// return pointer that points at chosen sprite
 			return pikachu;
 		}
@@ -480,6 +483,9 @@ const uint16_t *UserChoosePokemon()
 			
 			// send serial massage, report players choice
 			MessageLog(strcat(serialMessage, "Charmander!"));
+
+			// turn on red LED
+			GPIOA->ODR |= (1 << 0);
 
 			// return pointer that points at chosen sprite
 			return charmander;
@@ -695,6 +701,12 @@ void select_pika()//selects pokemon move
 	uint16_t color = RGBToWord(255,50,0);
 	int choice = move_down_func();//storing the users move choice
 
+	// turns red LED off
+	GPIOA->ODR &= ~(1 << 0);
+
+	// turn on yellow LED
+	GPIOB->ODR |= (1 << 3);
+
 	if(((GPIOB->IDR & (1 << 4)) == 0) )//checks if right button presssed
 	{
 		delay(500);//stops extra input
@@ -763,6 +775,9 @@ void select_pika()//selects pokemon move
 		default:
 			break;
 		}
+
+		// turns yellow LED off
+		GPIOB->ODR &= ~(1 << 3);
 	}
 }
 
@@ -832,6 +847,12 @@ void select_charmder()//func to select moves when user plays as charmander
 	uint16_t color = RGBToWord(255,50,0);
 	int choice = move_down_func();//storing the users choice
 
+	// turns yellow LED off
+	GPIOB->ODR &= ~(1 << 3);
+
+	// turn on red LED
+	GPIOA->ODR |= (1 << 0);
+
 	if(((GPIOB->IDR & (1 << 4)) == 0) )
 	{
 		delay(500);//stops extra input
@@ -894,9 +915,13 @@ void select_charmder()//func to select moves when user plays as charmander
 			break;
 			
 		
-		default:
+			default:
 			break;
 		}
+
+		// turns red LED off
+		GPIOA->ODR &= ~(1 << 0);
+
 	}
 		
 
@@ -941,6 +966,12 @@ void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 		char *prompt3 = "Char used Heal!";
 		int width = 125;
 		int height =40;
+
+		// turns yellow LED off
+		GPIOB->ODR &= ~(1 << 3);
+
+		// turn on red LED
+		GPIOA->ODR |= (1 << 0);
 
 		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow draw by move down func
 
@@ -995,6 +1026,9 @@ void cpu_choose_move_char()//function for letting the cpu' pokemon choode a move
 			return -1;//error
 			break;
 		}
+
+		// turns red LED off
+		GPIOA->ODR &= ~(1 << 0);
 	}
 }
 
@@ -1015,6 +1049,12 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 		char *prompt3 = "Pika used Heal!";
 		int width = 125;
 		int height =40;
+
+		// turns red LED off
+		GPIOA->ODR &= ~(1 << 0);
+
+		// turn on yellow LED
+		GPIOB->ODR |= (1 << 3);
 
 		fillRectangle(X, START + (1 - 1) * INC, 10, 10, 0x0);//removes arrow draw by move down func
 
@@ -1069,6 +1109,9 @@ void cpu_choose_move_pika()//function for letting the cpu' pokemon choode a move
 			return -1;
 			break;
 		}
+
+		// turns yellow LED off
+		GPIOB->ODR &= ~(1 << 3);
 	}
 }
 
