@@ -31,6 +31,11 @@
 #define X 65//constant x position of arrow
 #define START 118 // Arrow starting position
 
+
+#define FX_X_POS1 73
+#define FX_Y_POS1 45
+#define SIZE 16
+
 void initClock(void);
 void initSysTick(void);
 void SysTick_Handler(void);
@@ -153,6 +158,8 @@ const uint16_t dg1[]=
 };
 
 
+
+
 int pikachu_health = 80;
 int charmander_health = 80;
 
@@ -225,6 +232,7 @@ int main()
 		cpuSprite = CpuChoosePokemon(userSprite);
 		
 		// Drawing pokemon
+		
 		putImage(playerX, playerY, SPRITESIZE, SPRITESIZE, userSprite, 1, 0);
 		putImage(cpuX, cpuY, SPRITESIZE, SPRITESIZE, cpuSprite, 0, 0);
 		DrawMenuFrame(spacing, playerY+SPRITESIZE+spacing, menuThickness, RGBToWord(255,50,0));
@@ -869,13 +877,18 @@ void select_charmder()//func to select moves when user plays as charmander
 			printText(prompt2, 4, 126, color, 0);
 
 			ember(1);//call ember func to dammage opponent(1-damages cpu's pokemon)
+			putImage(FX_X_POS1,FX_Y_POS1,SIZE,SIZE,fireballVFX,0,0);
 
 			MessageLog(prompt2); // serial log
 
 			while (((GPIOB->IDR & (1 << 4)) != 0))//waits for right button input
 			{
+
 				//wait
+
 			}
+
+			fillRectangle(73,45,16,16,0x0);
 			fillRectangle(4, 115, width, height, 0x0);//erases promt
 			break;
 
@@ -1083,6 +1096,11 @@ void pika_health_animation()//func handaling pikachus health bar animations
 	{
 		pikachu_health = 0;
 	}
+	else if (pikachu_health > 80)
+	{
+		pikachu_health = 80;
+	}
+	
 	
 
 	int width = (45*pikachu_health)/80;//sets hp bar widh based on pikachu's current health
@@ -1192,9 +1210,9 @@ void heal(int attaker)//func to heal pokemon-not yet done
 			}
 			else
 			{
-				charmander_health = charmander_health + 10;
+				pikachu_health = pikachu_health + 10;
 
-				char_health_animation();
+				pika_health_animation();
 			}
 			break;
 
@@ -1205,8 +1223,8 @@ void heal(int attaker)//func to heal pokemon-not yet done
 			}
 			else
 			{
-				pikachu_health = pikachu_health + 10;
-				pika_health_animation();
+				charmander_health = charmander_health + 10;
+				char_health_animation();
 			}
 			break;
 			
@@ -1265,6 +1283,12 @@ void char_health_animation()//handales charmanders health animation
 	{
 		charmander_health = 0;
 	}
+	else if (charmander_health > 80)
+	{
+		charmander_health = 80;
+	}
+	
+
 	int width = (45*charmander_health)/80;//sets hp bar widh based on charmander's current health
 	uint16_t color_health_bar = RGBToWord(0,255,0);
 
