@@ -46,7 +46,7 @@ On the back ground there is a screen output of chosen player moves.
 
 #### Some very funny jokes on win/lose screens: 
 
-Dunno who wrote them honestly. <img width="318" height="287" alt="image-8" src="https://github.com/user-attachments/assets/6fd4e329-27fc-46fd-9b95-e575094a7bdb" />
+Dunno who wrote them honestly. <img width="40" alt="image-8" src="https://github.com/user-attachments/assets/6fd4e329-27fc-46fd-9b95-e575094a7bdb" />
 
 <img width="1616" height="759" alt="image-5" src="https://github.com/user-attachments/assets/205286cb-b04d-4b2f-9b85-03c97033f5a6" />
 
