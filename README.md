@@ -2,9 +2,9 @@
 
 <img width="1028" height="189" alt="image-9" src="https://github.com/user-attachments/assets/44076a41-4605-4e96-b24f-a87f9c99c1d7" />
 
-## This is a game developed for a microprocessor board about Pokemons, called Processormon.  Project was done for Microprocessor subject as a university assignment by a group of three
+## This is a game developed for a microprocessor board about Pokemon, called Processormon.  Project was done for Microprocessors module as a university assignment by a group of three.
 
-### You can watch the full [game play](https://www.youtube.com/watch?v=BOfZ6Vjg3zQ) on youtube or alternatively check out screen shots taken from the video down below
+### You can watch the full [game play](https://www.youtube.com/watch?v=BOfZ6Vjg3zQ) on youtube or alternatively check out screen shots taken from the video down below.
 
 ***
 
@@ -14,7 +14,7 @@
 
 ***
 
-#### Narrative of the game: just first screenshot, you can watch [the video](https://www.youtube.com/watch?v=BOfZ6Vjg3zQ) to see whole story
+#### Narrative of the game: just first screenshot, you can watch [the video](https://www.youtube.com/watch?v=BOfZ6Vjg3zQ) to see whole story.
 
 <img width="1606" height="649" alt="image-1" src="https://github.com/user-attachments/assets/55d4b6cc-d874-4881-8c29-6a5b5466b343" />
 
@@ -22,7 +22,7 @@
 
 #### Choosing your Pokemon: 
 
-The UI makes it easy to see which pokemon you chose.
+The UI makes it easy to see which pokemon you are choosing.
 
 <img width="1767" height="631" alt="image-2" src="https://github.com/user-attachments/assets/c25c4a79-9642-4a1a-906e-ee7cdf2827fa" />
 
@@ -30,7 +30,7 @@ The UI makes it easy to see which pokemon you chose.
 
 #### Fight UI:
 
-You may notice the red led in the right top corner lighted up which indicates that charmander is picked.
+You may notice the red led in the right top corner lighted up which indicates that Charmander is picked.
 
 <img width="1807" height="587" alt="image-3" src="https://github.com/user-attachments/assets/d77d0102-b696-4bdc-b2e1-2bbc01536b95" />
 
@@ -38,13 +38,13 @@ You may notice the red led in the right top corner lighted up which indicates th
 
 #### Debugging:
 
-On the back ground there is a screen output of chosen player moves.
+On the back ground (terminal) there is a screen output of chosen player moves.
 
 <img width="1220" height="764" alt="image-4" src="https://github.com/user-attachments/assets/a67bec38-25d7-47fa-8428-e1991551fdb3" />
 
 *** 
 
-#### Some very funny jokes on win/lose screens: 
+#### Some very funny jokes on victory/defeat screens: 
 
 Dunno who wrote them honestly. <img width="40" alt="image-8" src="https://github.com/user-attachments/assets/6fd4e329-27fc-46fd-9b95-e575094a7bdb" />
 
@@ -60,7 +60,7 @@ Dunno who wrote them honestly. <img width="40" alt="image-8" src="https://github
 
 ### How to compile and use the code
 
-#### Visual studio code
+#### Visual Studio Code
 
 * Extension: Platformio Microprocessor
 * Board: nucleo_f031k6
